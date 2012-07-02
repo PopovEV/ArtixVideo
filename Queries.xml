@@ -19,4 +19,10 @@
               <parameter value = "Amount" name = "Стоимость: " type = "decimal"/>
       </parameters>
   </Query>
+  <Query name="Показать позицию по стоимости покупки">
+    <value select="select * from pos_log_master where Amount = ${Amount}" />
+      <parameters>
+              <parameter value = "Amount" name = "Стоимость: " type = "decimal"/>
+      </parameters>
+  </Query>
  </QueryList>
