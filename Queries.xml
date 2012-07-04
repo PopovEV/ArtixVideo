@@ -1,28 +1,34 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <QueryList>
-  <Query name = "Показать позиции за период времени">
-    <value select="select * from pos_log_master where date_begin &gt;= ${date_beg_par} and date_end  &lt;= ${date_end_par}" />
+  <Query name = "Показать позиции за период времени" child = "" ischild = "false">
+        <SQL>
+            select *
+            from pos_log_master
+            where date_begin &gt;= ${date_beg_par} and date_end  &lt;= ${date_end_par}
+        </SQL>
 	<parameters>
-		<parameter value = "date_beg_par" name = "Начальная дата и время: " type = "datetime"/>
-		<parameter value = "date_end_par" name = "Конечная дата и время: " type = "datetime"/>
+                <parameter value = "date_beg" name = "Начальная дата и время: " type = "datetime"/>
+                <parameter value = "date_end" name = "Конечная дата и время: " type = "datetime"/>
 	</parameters>
   </Query>
-  <Query name="Показать позицию по номеру чека">
-    <value select="select * from pos_log_master where checkNum = ${СheckNum}" />
+  <Query name="Показать позицию по номеру чека" child = "" ischild = "false">
+        <SQL>
+            select *
+            from pos_log_master
+            where checkNum = ${СheckNum}
+        </SQL>
 	<parameters>
 		<parameter value = "СheckNum" name = "Номер чека: " type = "integer"/>
 	</parameters>
   </Query>
-  <Query name="Показать позицию по стоимости покупки">
-    <value select="select * from pos_log_master where Amount = ${Amount}" />
-      <parameters>
-              <parameter value = "Amount" name = "Стоимость: " type = "decimal"/>
-      </parameters>
-  </Query>
-  <Query name="Показать позицию по стоимости покупки">
-    <value select="select * from pos_log_master where Amount = ${Amount}" />
-      <parameters>
-              <parameter value = "Amount" name = "Стоимость: " type = "decimal"/>
-      </parameters>
+  <Query name="Показать позицию по стоимости покупки" child = "" ischild = "false">
+        <SQL>
+            select *
+            from pos_log_master
+            where Amount = ${Amount}
+        </SQL>
+        <parameters>
+                <parameter value = "Amount" name = "Стоимость: " type = "decimal"/>
+        </parameters>
   </Query>
  </QueryList>

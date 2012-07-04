@@ -52,21 +52,24 @@ void XMLReader::traverseNode(const QDomNode &node)
             {
                 if(domElement.tagName() == "Query")
                 {
-                    qDebug() << "Query: " << domElement.attribute("name", "");
+                    qDebug() << "Query:"
+                    << "\nname: " << domElement.attribute("name", "")
+                    << "\nchild: " << domElement.attribute("child", "")
+                    << "\nischild: " << domElement.attribute("ischild", "");
                 }
                 else
-                    if(domElement.tagName() == "value")
+                    if(domElement.tagName() == "SQL")
                     {
-                        qDebug() << "value: " << domElement.attribute("select", "");
-                        //qDebug() << "select: " << domElement.text();
+                        //qDebug() << "value: " << domElement.attribute("select", "");
+                        qDebug() << "select: " << domElement.text();
                     }
                     else
                         if(domElement.tagName() == "parameter")
                         {
-                            qDebug() << "parameter: ";
-                            qDebug() << "value " << domElement.attribute("value", "");
-                            qDebug() << "name: " << domElement.attribute("name", "");
-                            qDebug() << "type: " << domElement.attribute("type", "");
+                            qDebug() << "parameter: "
+                            << "\nvalue " << domElement.attribute("value", "")
+                            << "\nname: " << domElement.attribute("name", "")
+                            << "\ntype: " << domElement.attribute("type", "");
                         }
                         else
                         {
