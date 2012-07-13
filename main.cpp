@@ -3,6 +3,7 @@
 
 #include "mainwindow.h"
 #include "xmlreader.h"
+#include "sql.h"
 
 int main(int argc, char *argv[])
 {
@@ -11,11 +12,19 @@ int main(int argc, char *argv[])
 
     QApplication a(argc, argv);
 
-    MainWindow w;
-    w.show();
-
     XMLReader *xml_reader = new XMLReader();
+    //xml_reader->setMainWindow(w);
+
+    SQL * sql_db = new SQL();
+    sql_db->createConnection();
+
+    MainWindow* w = new MainWindow();
+    w->setAttribute(Qt::WA_AlwaysShowToolTips, true);
+    w->setXMLReader(xml_reader);
+
     xml_reader->ReadFile("d:/POVT/NIRS/Projects/ArtixVideo/Queries.xml");
+
+    w->show();
 
     return a.exec();
 }

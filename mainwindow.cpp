@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "xmlreader.h"
 #include <QtGui>
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -7,8 +8,18 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    HeightToolBox = this->height() * 2/3 - 20;
-    addToolBox();
+
+    int count = ui->toolBox->count();
+    for(int i = 0; i < count; ++i)
+        ui->toolBox->removeItem(i);
+
+    HeightToolBox = this->height() * 2/3 - 55;
+
+    setPropertyToolBox();
+
+    connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(ClickedFind()));
+    connect(ui->HorisontalSplitter, SIGNAL(splitterMoved(int,int)), this, SLOT(movedHorisontalSplitter(int,int)));
+
 }
 
 MainWindow::~MainWindow()
@@ -16,67 +27,91 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::addToolBox()
+void MainWindow::setPropertyToolBox()
 {
-    pScrollArea = new QScrollArea(this);
-    pFrameVideo = new QFrame(this);
-    pToolBox = new QToolBox(pScrollArea);
-    pHorisontalSplitter = new QSplitter(Qt::Horizontal, this);
-    pVerticalSplitter = new QSplitter(Qt::Vertical, this);
+    ui->frameToolBox->resize(this->width() / 3, this->height() * 2 / 3);
 
-    pScrollArea->setWidget(pToolBox);
-    pScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-    pScrollArea->resize(this->width() / 3, this->height() * 2 / 3);
+    ui->scrollArea->resize(ui->frameToolBox->width(), ui->frameToolBox->height() - 50);
 
-    pToolBox->resize(pScrollArea->width() - 20, HeightToolBox);
-    pToolBox->setStyleSheet(" QToolBox::tab { font: bold; color: green} ");
-    setHeightToolBox(1);
+    ui->toolBox->resize(ui->scrollArea->width() - 20, HeightToolBox);
+    ui->toolBox->setStyleSheet(" QToolBox::tab { font: bold; color: green } ");
 
-    pFrameVideo->setFrameShape(QFrame::Box);
-
-    pHorisontalSplitter->addWidget(pScrollArea);
-    pHorisontalSplitter->addWidget(pFrameVideo);
-    pHorisontalSplitter->resize(this->width(), this->height() * 2 / 3);
+    ui->HorisontalSplitter->resize(this->width(), this->height() * 2 / 3);
 
     QList<int> sizes_widgets;
-    sizes_widgets << pScrollArea->width() << this->width() - pScrollArea->width();
-    pHorisontalSplitter->setSizes(sizes_widgets);
+    sizes_widgets << ui->scrollArea->width() << this->width() - ui->scrollArea->width();
+    ui->HorisontalSplitter->setSizes(sizes_widgets);
 
-    pVerticalSplitter->addWidget(pHorisontalSplitter);
-    pVerticalSplitter->addWidget(new QFrame());
-    pVerticalSplitter->resize(this->width(), this->height() - menuBar()->height());
-    pVerticalSplitter->move(0, menuBar()->height());
+    ui->VerticalSplitter->resize(this->width(), this->height() - menuBar()->height());
 
     sizes_widgets.clear();
     sizes_widgets << this->height() * 2 / 3 << this->height() * 1 / 3;
-    pVerticalSplitter->setSizes(sizes_widgets);
+    ui->VerticalSplitter->setSizes(sizes_widgets);
+}
 
-
-    for(int i = 0; i<1; ++i)
-    {
-        pToolBox->addItem(new QLabel("aaa\nqqqqqq\nqqqqqqq\nqqqqqqq", pToolBox), tr("Вкл\nадка %1").arg(i));
-    }
-
+void MainWindow::setXMLReader(XMLReader *p)
+{
+    pXMLReader = p;
+    connect(pXMLReader, SIGNAL(addItem(const char*)), SLOT(addItemInToolBox(const char*)));
 }
 
 void MainWindow::setHeightToolBox(qint32 count_query)
 {
     HeightToolBox = count_query * 45;
-    if(HeightToolBox < pToolBox->height())
-        HeightToolBox = pToolBox->height();
 
-    pToolBox->resize(pToolBox->width(), HeightToolBox);
+    if(HeightToolBox < ui->toolBox->height())
+    {
+        HeightToolBox = ui->toolBox->height();
+        return;
+    }
+
+    ui->toolBox->resize(ui->toolBox->width(), HeightToolBox);
+}
+
+QFormLayout *MainWindow::addItemInToolBox(const char *text)
+{
+    QFrame *pFrame = new QFrame(ui->toolBox);
+    pFrame->setFrameShape(QFrame::Box);
+
+    QFormLayout *pFormLayout = new QFormLayout(pFrame);
+
+    QWidget *newItem = ui->toolBox->widget(ui->toolBox->addItem(pFrame, tr(text)));
+    newItem->setToolTip(QString(tr(text)));
+
+    setHeightToolBox(pXMLReader->getCountQuery());
+
+    return pFormLayout;
+}
+
+void MainWindow::ClickedFind()
+{
+    int index = ui->toolBox->currentIndex();
+
+
+}
+
+void MainWindow::movedHorisontalSplitter(int pos, int index)
+{
+
+    ui->scrollArea->resize(pos, ui->scrollArea->height());
+    ui->toolBox->resize(pos - 20, ui->toolBox->height());
+    ui->pushButton->move(pos / 2 - ui->pushButton->width() / 2, ui->pushButton->y());
+
 }
 
 void MainWindow::resizeEvent(QResizeEvent *pe)
 {
-    pVerticalSplitter->resize(pe->size().width(), pe->size().height() - menuBar()->height());
-    pHorisontalSplitter->resize(pe->size().width(), pe->size().height() *2/3);
+    ui->VerticalSplitter->resize(pe->size().width(), pe->size().height() - menuBar()->height());
+    ui->HorisontalSplitter->resize(pe->size().width(), pe->size().height() * 2/3);
 
     QList<int> sizes_widgets;
     sizes_widgets << this->height() * 2 / 3 << this->height() * 1 / 3;
-    pVerticalSplitter->setSizes(sizes_widgets);
+    ui->VerticalSplitter->setSizes(sizes_widgets);
 
-    pToolBox->resize(pScrollArea->width() - 20, HeightToolBox);
+    ui->scrollArea->resize(ui->frameToolBox->width(), ui->frameToolBox->height() - 50);
+    ui->toolBox->resize(ui->scrollArea->width() - 20, HeightToolBox);
+
+    qint32 x_button = (ui->frameToolBox->width() - ui->pushButton->width()) / 2;
+    qint32 y_button = ui->scrollArea->height() + (ui->frameToolBox->height() - ui->scrollArea->height()) / 2 - ui->pushButton->height() / 2;
+    ui->pushButton->move(x_button, y_button);
 }
-

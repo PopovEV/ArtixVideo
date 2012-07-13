@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <QueryList>
-  <Query name = "Показать позиции за период времени" child = "" ischild = "false">
+  <Query num = "1" name = "Показать позиции за период времени" child = "" ischild = "false">
         <SQL>
             select *
             from pos_log_master
@@ -11,24 +11,154 @@
                 <parameter value = "date_end" name = "Конечная дата и время: " type = "datetime"/>
 	</parameters>
   </Query>
-  <Query name="Показать позицию по номеру чека" child = "" ischild = "false">
+  <Query num = "2" name="Показать позицию по номеру чека" child = "" ischild = "false">
         <SQL>
             select *
             from pos_log_master
             where checkNum = ${СheckNum}
         </SQL>
 	<parameters>
-		<parameter value = "СheckNum" name = "Номер чека: " type = "integer"/>
+		<parameter value = "СheckNum" name = "Номер чека: " type = "int"/>
 	</parameters>
   </Query>
-  <Query name="Показать позицию по стоимости покупки" child = "" ischild = "false">
+  <Query num = "3" name="Показать позицию по стоимости покупки" child = "" ischild = "false">
         <SQL>
             select *
             from pos_log_master
             where Amount = ${Amount}
         </SQL>
         <parameters>
-                <parameter value = "Amount" name = "Стоимость: " type = "decimal"/>
+                <parameter value = "Amount" name = "Стоимость: " type = "currency"/>
         </parameters>
   </Query>
+  <Query num = "3" name="Показать позицию по стоимости покупки" child = "" ischild = "false">
+        <SQL>
+            select *
+            from pos_log_master
+            where Amount = ${Amount}
+        </SQL>
+        <parameters>
+		<parameter value = "Amount" name = "Стоимость: " type = "currency"/>
+        </parameters>
+  </Query>
+    <Query num = "3" name="Показать позицию по стоимости покупки" child = "" ischild = "false">
+        <SQL>
+            select *
+            from pos_log_master
+            where Amount = ${Amount}
+        </SQL>
+        <parameters>
+                <parameter value = "Amount" name = "Стоимость: " type = "currency"/>
+        </parameters>
+  </Query>
+    <Query num = "3" name="Показать позицию по стоимости покупки" child = "" ischild = "false">
+        <SQL>
+            select *
+            from pos_log_master
+            where Amount = ${Amount}
+        </SQL>
+        <parameters>
+                <parameter value = "Amount" name = "Стоимость: " type = "currency"/>
+        </parameters>
+  </Query>
+    <Query num = "3" name="Показать позицию по стоимости покупки" child = "" ischild = "false">
+        <SQL>
+            select *
+            from pos_log_master
+            where Amount = ${Amount}
+        </SQL>
+        <parameters>
+                <parameter value = "Amount" name = "Стоимость: " type = "currency"/>
+        </parameters>
+  </Query>
+    <Query num = "3" name="Показать позицию по стоимости покупки" child = "" ischild = "false">
+        <SQL>
+            select *
+            from pos_log_master
+            where Amount = ${Amount}
+        </SQL>
+        <parameters>
+                <parameter value = "Amount" name = "Стоимость: " type = "currency"/>
+        </parameters>
+  </Query>
+    <Query num = "3" name="Показать позицию по стоимости покупки" child = "" ischild = "false">
+        <SQL>
+            select *
+            from pos_log_master
+            where Amount = ${Amount}
+        </SQL>
+        <parameters>
+                <parameter value = "Amount" name = "Стоимость: " type = "currency"/>
+        </parameters>
+  </Query>
+    <Query num = "3" name="Показать позицию по стоимости покупки" child = "" ischild = "false">
+        <SQL>
+            select *
+            from pos_log_master
+            where Amount = ${Amount}
+        </SQL>
+        <parameters>
+                <parameter value = "Amount" name = "Стоимость: " type = "currency"/>
+        </parameters>
+  </Query>
+    <Query num = "3" name="Показать позицию по стоимости покупки" child = "" ischild = "false">
+        <SQL>
+            select *
+            from pos_log_master
+            where Amount = ${Amount}
+        </SQL>
+        <parameters>
+                <parameter value = "Amount" name = "Стоимость: " type = "currency"/>
+        </parameters>
+  </Query>
+    <Query num = "3" name="Показать позицию по стоимости покупки" child = "" ischild = "false">
+        <SQL>
+            select *
+            from pos_log_master
+            where Amount = ${Amount}
+        </SQL>
+        <parameters>
+                <parameter value = "Amount" name = "Стоимость: " type = "currency"/>
+        </parameters>
+  </Query>
+    <Query num = "3" name="Показать позицию по стоимости покупки" child = "" ischild = "false">
+        <SQL>
+            select *
+            from pos_log_master
+            where Amount = ${Amount}
+        </SQL>
+        <parameters>
+                <parameter value = "Amount" name = "Стоимость: " type = "currency"/>
+        </parameters>
+  </Query>
+    <Query num = "3" name="Показать позицию по стоимости покупки" child = "" ischild = "false">
+        <SQL>
+            select *
+            from pos_log_master
+            where Amount = ${Amount}
+        </SQL>
+        <parameters>
+                <parameter value = "Amount" name = "Стоимость: " type = "currency"/>
+        </parameters>
+  </Query>
+    <Query num = "3" name="Показать позицию по стоимости покупки" child = "" ischild = "false">
+        <SQL>
+            select *
+            from pos_log_master
+            where Amount = ${Amount}
+        </SQL>
+        <parameters>
+                <parameter value = "Amount" name = "Стоимость: " type = "currency"/>
+        </parameters>
+  </Query>  
+  <Query num = "3" name="Показать позицию по стоимости покупки" child = "" ischild = "false">
+        <SQL>
+            select *
+            from pos_log_master
+            where Amount = ${Amount}
+        </SQL>
+        <parameters>
+                <parameter value = "Amount" name = "Стоимость: " type = "currency"/>
+        </parameters>
+  </Query>  
  </QueryList>

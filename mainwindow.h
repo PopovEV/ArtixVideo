@@ -3,6 +3,7 @@
 
 #include <QtGui>
 
+#include "xmlreader.h"
 
 namespace Ui {
 class MainWindow;
@@ -15,22 +16,24 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-    void addToolBox();
+    void setPropertyToolBox();
+    void setXMLReader(XMLReader *p);
     void setHeightToolBox(qint32 count_query);
 
-private:
     Ui::MainWindow *ui;
 
-    QScrollArea *pScrollArea;
-    QFrame      *pFrameVideo;
-    QFrame      *pFrameTable;
-    QToolBox    *pToolBox;
-    QSplitter   *pHorisontalSplitter;
-    QSplitter   *pVerticalSplitter;
-
+private:
     qint32 HeightToolBox;
 
+    XMLReader *pXMLReader;
+
+signals:
+
+
 public slots:
+    void ClickedFind();
+    void movedHorisontalSplitter(int pos, int index);
+    QFormLayout *addItemInToolBox(const char* text);
 
 protected:
     virtual void resizeEvent(QResizeEvent *pe);

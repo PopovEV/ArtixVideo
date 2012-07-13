@@ -1,11 +1,19 @@
 #include <QMessageBox>
+#include <QLabel>
+#include <QLineEdit>
+#include <QDateEdit>
+#include <QDateTimeEdit>
+
 #include <stdio.h>
 
 #include "xmlreader.h"
+#include "longintvalidator.h"
+#include "currencyvalidator.h"
 
-
-XMLReader::XMLReader()
+XMLReader::XMLReader(QObject *parent) :
+    QObject(parent)
 {
+        countQuery = 0;
 }
 
 void XMLReader::ReadFile(const QString &FileName)
@@ -52,6 +60,10 @@ void XMLReader::traverseNode(const QDomNode &node)
             {
                 if(domElement.tagName() == "Query")
                 {
+                    countQuery++;
+
+                    pNewItemFrame = emit addItem(domElement.attribute("name", "").toUtf8().data());
+
                     qDebug() << "Query:"
                     << "\nname: " << domElement.attribute("name", "")
                     << "\nchild: " << domElement.attribute("child", "")
@@ -60,12 +72,14 @@ void XMLReader::traverseNode(const QDomNode &node)
                 else
                     if(domElement.tagName() == "SQL")
                     {
-                        //qDebug() << "value: " << domElement.attribute("select", "");
                         qDebug() << "select: " << domElement.text();
                     }
                     else
                         if(domElement.tagName() == "parameter")
                         {
+
+                            pNewItemFrame->addRow(domElement.attribute("name", ""), createInputBox(&domElement.attribute("type", "")));
+
                             qDebug() << "parameter: "
                             << "\nvalue " << domElement.attribute("value", "")
                             << "\nname: " << domElement.attribute("name", "")
@@ -80,4 +94,60 @@ void XMLReader::traverseNode(const QDomNode &node)
         traverseNode(domNode);
         domNode = domNode.nextSibling();
     }
+}
+
+QWidget *XMLReader::createInputBox(const QString *type)
+{
+    if(type->toUpper() == "INT")
+    {
+        LongIntValidator *pLongIntValidator = new LongIntValidator();
+
+        QLineEdit *pLineEdit = new QLineEdit();
+        pLineEdit->setValidator(pLongIntValidator);
+
+        return pLineEdit;
+    }
+    else
+        if(type->toUpper() == "CHAR")
+        {
+            QLineEdit *pLineEdit = new QLineEdit();
+
+            return pLineEdit;
+        }
+        else
+            if(type->toUpper() == "CURRENCY")
+            {
+//                QDoubleValidator *pDoubleValidator = new QDoubleValidator();
+//                pDoubleValidator->setDecimals(2);
+//                pDoubleValidator->setNotation(QDoubleValidator::StandardNotation);
+                CurrencyValidator *pCurrencyValidator = new CurrencyValidator();
+
+                QLineEdit *pLineEdit = new QLineEdit();
+                pLineEdit->setValidator(pCurrencyValidator);
+
+                return pLineEdit;
+            }
+            else
+                if(type->toUpper() == "DATE")
+                {
+                    QDateEdit *pDateEdit = new QDateEdit(QDate::currentDate());
+
+                    return pDateEdit;
+                }
+                else
+                    if(type->toUpper() == "DATETIME")
+                    {
+                        QDateTimeEdit *pDateTimeEdit = new QDateTimeEdit(QDateTime::currentDateTime());
+
+                        return pDateTimeEdit;
+                    }
+                    else
+                        return 0;
+
+}
+
+
+qint32 XMLReader::getCountQuery()
+{
+    return countQuery;
 }

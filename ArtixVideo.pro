@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui xml
+QT       += core gui xml sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -14,10 +14,16 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    xmlreader.cpp
+    sql.cpp \
+    xmlreader.cpp \
+    longintvalidator.cpp \
+    currencyvalidator.cpp
 
 HEADERS  += mainwindow.h \
-    xmlreader.h
+    sql.h \
+    xmlreader.h \
+    longintvalidator.h \
+    currencyvalidator.h
 
 FORMS    += mainwindow.ui
 
