@@ -3,9 +3,6 @@
 #include <QTableView>
 
 #include "sql.h"
-#include "mainwindow.h"
-
-
 
 SQL::SQL(QObject *parent) :
     QObject(parent)
@@ -30,22 +27,32 @@ bool SQL::createConnection()
         return false;
     }
 
-    sqlmodel = new QSqlQueryModel();
-
     return true;
 }
 
-bool SQL::QueryExec(QTableView *pTableView, const QString &query)
+QSqlQueryModel * SQL::QueryExec()
 {
-    sqlmodel->setQuery(query, db);
+    sqlmodel = new QSqlQueryModel();
+
+    sqlquery.exec();
+    sqlmodel->setQuery(sqlquery);
 
     if(sqlmodel->lastError().isValid())
     {
-        qDebug()<< sqlmodel->lastError();
-        return false;
+        qDebug() << sqlmodel->lastError();
+        return 0;
     }
 
-    pTableView->setModel(sqlmodel);
+    return sqlmodel;
+}
 
-    return true;
+void SQL::SqlPrepare(const QString &query)
+{
+    sqlquery = QSqlQuery::QSqlQuery(db);
+    qDebug() << sqlquery.prepare(query);
+}
+
+void SQL::setQueryValue(const QString &param_name, const QString &value)
+{
+    sqlquery.bindValue(param_name, value);
 }

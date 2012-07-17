@@ -3,8 +3,7 @@
 
 #include <QObject>
 #include <QtSql>
-
-#include "mainwindow.h"
+#include <QTableView>
 
 class SQL : public QObject
 {
@@ -14,11 +13,14 @@ public:
 
     bool createConnection();
 
-    bool QueryExec(QTableView *pTableView, const QString& query);
+    QSqlQueryModel *QueryExec();
+    void SqlPrepare (const QString &query);
+    void setQueryValue(const QString &param_name, const QString &value);
     
 private:
     QSqlDatabase db;
     QSqlQueryModel *sqlmodel;
+    QSqlQuery sqlquery;
 
 signals:
     

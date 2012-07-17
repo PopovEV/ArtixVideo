@@ -13,16 +13,16 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     XMLReader *xml_reader = new XMLReader();
-    //xml_reader->setMainWindow(w);
 
-    SQL * sql_db = new SQL();
-    sql_db->createConnection();
+    SQL * sql_db = new SQL();    
 
     MainWindow* w = new MainWindow();
     w->setAttribute(Qt::WA_AlwaysShowToolTips, true);
     w->setXMLReader(xml_reader);
+    w->setSQL(sql_db);
 
     xml_reader->ReadFile("d:/POVT/NIRS/Projects/ArtixVideo/Queries.xml");
+    sql_db->createConnection();
 
     w->show();
 

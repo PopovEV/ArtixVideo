@@ -39,6 +39,7 @@ void XMLReader::ReadFile(const QString &FileName)
         {
             QDomElement domElement = domDoc.documentElement();
             traverseNode(domElement);
+            PrintQueryList();
         }
         file.close();
     }
@@ -64,15 +65,27 @@ void XMLReader::traverseNode(const QDomNode &node)
 
                     pNewItemFrame = emit addItem(domElement.attribute("name", "").toUtf8().data());
 
-                    qDebug() << "Query:"
-                    << "\nname: " << domElement.attribute("name", "")
-                    << "\nchild: " << domElement.attribute("child", "")
-                    << "\nischild: " << domElement.attribute("ischild", "");
+                    Query newQuery;
+                    newQuery.num = domElement.attribute("num", "").toInt();
+                    newQuery.child = domElement.attribute("child", "").toInt();
+                    if(domElement.attribute("ischild", "").toUpper() == "TRUE")
+                        newQuery.ischild = true;
+                    else
+                        newQuery.ischild = false;
+
+
+                    QueryList.push_back(newQuery);
+
+//                    qDebug() << "Query:"
+//                    << "\nname: " << domElement.attribute("name", "")
+//                    << "\nchild: " << domElement.attribute("child", "")
+//                    << "\nischild: " << domElement.attribute("ischild", "");
                 }
                 else
                     if(domElement.tagName() == "SQL")
                     {
-                        qDebug() << "select: " << domElement.text();
+                        QueryList.back().sql = domElement.text();
+//                        qDebug() << "select: " << domElement.text();
                     }
                     else
                         if(domElement.tagName() == "parameter")
@@ -80,14 +93,20 @@ void XMLReader::traverseNode(const QDomNode &node)
 
                             pNewItemFrame->addRow(domElement.attribute("name", ""), createInputBox(&domElement.attribute("type", "")));
 
-                            qDebug() << "parameter: "
-                            << "\nvalue " << domElement.attribute("value", "")
-                            << "\nname: " << domElement.attribute("name", "")
-                            << "\ntype: " << domElement.attribute("type", "");
+                            Parameter newParameter;
+                            newParameter.value = ":" + domElement.attribute("value", "") ;
+                            newParameter.type = domElement.attribute("type", "");
+
+                            QueryList.back().ParameterList.push_back(newParameter);
+
+//                            qDebug() << "parameter: "
+//                            << "\nvalue " << domElement.attribute("value", "")
+//                            << "\nname: " << domElement.attribute("name", "")
+//                            << "\ntype: " << domElement.attribute("type", "");
                         }
                         else
                         {
-                            qDebug() << "TagName: " << domElement.tagName() << "\tText: " << domElement.text();
+                            //qDebug() << "TagName: " << domElement.tagName() << "\tText: " << domElement.text();
                         }
             }
         }
@@ -117,9 +136,6 @@ QWidget *XMLReader::createInputBox(const QString *type)
         else
             if(type->toUpper() == "CURRENCY")
             {
-//                QDoubleValidator *pDoubleValidator = new QDoubleValidator();
-//                pDoubleValidator->setDecimals(2);
-//                pDoubleValidator->setNotation(QDoubleValidator::StandardNotation);
                 CurrencyValidator *pCurrencyValidator = new CurrencyValidator();
 
                 QLineEdit *pLineEdit = new QLineEdit();
@@ -131,6 +147,7 @@ QWidget *XMLReader::createInputBox(const QString *type)
                 if(type->toUpper() == "DATE")
                 {
                     QDateEdit *pDateEdit = new QDateEdit(QDate::currentDate());
+                    pDateEdit->setCalendarPopup(true);
 
                     return pDateEdit;
                 }
@@ -138,6 +155,7 @@ QWidget *XMLReader::createInputBox(const QString *type)
                     if(type->toUpper() == "DATETIME")
                     {
                         QDateTimeEdit *pDateTimeEdit = new QDateTimeEdit(QDateTime::currentDateTime());
+                        pDateTimeEdit->setCalendarPopup(true);
 
                         return pDateTimeEdit;
                     }
@@ -150,4 +168,25 @@ QWidget *XMLReader::createInputBox(const QString *type)
 qint32 XMLReader::getCountQuery()
 {
     return countQuery;
+}
+
+Query XMLReader::getQuery(qint32 index)
+{
+    return QueryList.value(index);
+}
+
+void XMLReader::PrintQueryList()
+{
+    for(int i = 0; i < QueryList.count(); ++i)
+    {
+        qDebug() << QueryList.at(i).num ;
+        qDebug() << QueryList.at(i).child ;
+        qDebug() << QueryList.at(i).ischild ;
+        qDebug() << QueryList.at(i).sql ;
+        for(int j = 0; j < QueryList.at(i).ParameterList.count(); ++j)
+        {
+            qDebug() << QueryList.at(i).ParameterList.at(j).value ;
+            qDebug() << QueryList.at(i).ParameterList.at(j).type;
+        }
+    }
 }

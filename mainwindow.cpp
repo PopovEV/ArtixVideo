@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "xmlreader.h"
+
 #include <QtGui>
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -55,6 +55,11 @@ void MainWindow::setXMLReader(XMLReader *p)
     connect(pXMLReader, SIGNAL(addItem(const char*)), SLOT(addItemInToolBox(const char*)));
 }
 
+void MainWindow::setSQL(SQL *p)
+{
+    pSQL = p;
+}
+
 void MainWindow::setHeightToolBox(qint32 count_query)
 {
     HeightToolBox = count_query * 45;
@@ -72,11 +77,14 @@ QFormLayout *MainWindow::addItemInToolBox(const char *text)
 {
     QFrame *pFrame = new QFrame(ui->toolBox);
     pFrame->setFrameShape(QFrame::Box);
+    pFrame->setObjectName("FrameIntoToolBox");
 
     QFormLayout *pFormLayout = new QFormLayout(pFrame);
+    pFormLayout->setObjectName("FormLayout");
 
     QWidget *newItem = ui->toolBox->widget(ui->toolBox->addItem(pFrame, tr(text)));
     newItem->setToolTip(QString(tr(text)));
+    newItem->setObjectName("AddItem");
 
     setHeightToolBox(pXMLReader->getCountQuery());
 
@@ -87,7 +95,38 @@ void MainWindow::ClickedFind()
 {
     int index = ui->toolBox->currentIndex();
 
+    Query currentQuery = pXMLReader->getQuery(index);
 
+    pSQL->SqlPrepare(currentQuery.sql);
+
+    QFormLayout *pFormLayout = dynamic_cast<QFormLayout *> (ui->toolBox->currentWidget()->children().first());
+
+    for(int i = 0; i < currentQuery.ParameterList.size(); ++i)
+    {
+        QLayoutItem *pLayoutItem = dynamic_cast<QLayoutItem *> (pFormLayout->itemAt(i, QFormLayout::FieldRole));
+
+        QString str;
+
+        if(QDateEdit *pDateEdit = dynamic_cast<QDateEdit *> (pLayoutItem->widget()))
+        {
+            str = pDateEdit->date().toString("yyyy-MM-dd");
+        }
+        else
+            if(QDateTimeEdit *pDateTimeEdit = dynamic_cast<QDateTimeEdit *> (pLayoutItem->widget()))
+            {
+                str = pDateTimeEdit->dateTime().toString("yyyy-MM-dd hh:mm:ss");
+            }
+            else
+                if(QLineEdit *pLineEdit = dynamic_cast<QLineEdit *> (pLayoutItem->widget()))
+                {
+                    str = pLineEdit->text();
+                }
+        qDebug() << currentQuery.ParameterList.at(i).value;
+        pSQL->setQueryValue(currentQuery.ParameterList.at(i).value, str);
+    }
+
+    ui->tableView->setModel(pSQL->QueryExec());
+    ui->tableView->show();
 }
 
 void MainWindow::movedHorisontalSplitter(int pos, int index)
@@ -101,7 +140,7 @@ void MainWindow::movedHorisontalSplitter(int pos, int index)
 
 void MainWindow::resizeEvent(QResizeEvent *pe)
 {
-    ui->VerticalSplitter->resize(pe->size().width(), pe->size().height() - menuBar()->height());
+    ui->VerticalSplitter->resize(pe->size().width(), pe->size().height() - menuBar()->height() - statusBar()->height());
     ui->HorisontalSplitter->resize(pe->size().width(), pe->size().height() * 2/3);
 
     QList<int> sizes_widgets;

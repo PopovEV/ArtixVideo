@@ -4,6 +4,7 @@
 #include <QtGui>
 
 #include "xmlreader.h"
+#include "sql.h"
 
 namespace Ui {
 class MainWindow;
@@ -18,6 +19,7 @@ public:
     ~MainWindow();
     void setPropertyToolBox();
     void setXMLReader(XMLReader *p);
+    void setSQL(SQL *p);
     void setHeightToolBox(qint32 count_query);
 
     Ui::MainWindow *ui;
@@ -26,6 +28,7 @@ private:
     qint32 HeightToolBox;
 
     XMLReader *pXMLReader;
+    SQL *pSQL;
 
 signals:
 

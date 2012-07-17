@@ -4,68 +4,57 @@
         <SQL>
             select *
             from pos_log_master
-            where date_begin &gt;= ${date_beg_par} and date_end  &lt;= ${date_end_par}
+	    where date_begin &gt;= :date_beg and date_end  &lt;= :date_end
         </SQL>
 	<parameters>
-                <parameter value = "date_beg" name = "Начальная дата и время: " type = "datetime"/>
-                <parameter value = "date_end" name = "Конечная дата и время: " type = "datetime"/>
+		<parameter value = "date_beg" name = "Начальная дата и время: " type = "datetime"/>
+		<parameter value = "date_end" name = "Конечная дата и время: " type = "datetime"/>
 	</parameters>
   </Query>
   <Query num = "2" name="Показать позицию по номеру чека" child = "" ischild = "false">
         <SQL>
             select *
-            from pos_log_master
-            where checkNum = ${СheckNum}
+	    from pos_log_master
+	    where CheckNumber = :CheckNum
         </SQL>
 	<parameters>
-		<parameter value = "СheckNum" name = "Номер чека: " type = "int"/>
+		<parameter value = "CheckNum" name = "Номер чека: " type = "int"/>
 	</parameters>
   </Query>
   <Query num = "3" name="Показать позицию по стоимости покупки" child = "" ischild = "false">
         <SQL>
             select *
             from pos_log_master
-            where Amount = ${Amount}
+			where Amount = :Amount
         </SQL>
         <parameters>
                 <parameter value = "Amount" name = "Стоимость: " type = "currency"/>
         </parameters>
   </Query>
-  <Query num = "3" name="Показать позицию по стоимости покупки" child = "" ischild = "false">
+  <Query num = "4" name="Показать позицию по стоимости покупки" child = "" ischild = "false">
         <SQL>
             select *
             from pos_log_master
-            where Amount = ${Amount}
+			where Amount = :Amount
         </SQL>
         <parameters>
-		<parameter value = "Amount" name = "Стоимость: " type = "currency"/>
+		<parameter value = "Amount" name = "Стоимость: " type = "date"/>
+        </parameters>
+  </Query>
+    <Query num = "5" name="Все субтитры" child = "" ischild = "false">
+        <SQL>
+	    select *
+	    from subtitles
+        </SQL>
+        <parameters>
+		<!-- <parameter value = "Amount" name = "Стоимость: " type = "currency"/> -->
         </parameters>
   </Query>
     <Query num = "3" name="Показать позицию по стоимости покупки" child = "" ischild = "false">
         <SQL>
             select *
             from pos_log_master
-            where Amount = ${Amount}
-        </SQL>
-        <parameters>
-                <parameter value = "Amount" name = "Стоимость: " type = "currency"/>
-        </parameters>
-  </Query>
-    <Query num = "3" name="Показать позицию по стоимости покупки" child = "" ischild = "false">
-        <SQL>
-            select *
-            from pos_log_master
-            where Amount = ${Amount}
-        </SQL>
-        <parameters>
-                <parameter value = "Amount" name = "Стоимость: " type = "currency"/>
-        </parameters>
-  </Query>
-    <Query num = "3" name="Показать позицию по стоимости покупки" child = "" ischild = "false">
-        <SQL>
-            select *
-            from pos_log_master
-            where Amount = ${Amount}
+	    where Amount = :Amount
         </SQL>
         <parameters>
                 <parameter value = "Amount" name = "Стоимость: " type = "currency"/>
@@ -75,7 +64,7 @@
         <SQL>
             select *
             from pos_log_master
-            where Amount = ${Amount}
+	    where Amount = :Amount
         </SQL>
         <parameters>
                 <parameter value = "Amount" name = "Стоимость: " type = "currency"/>
@@ -85,7 +74,7 @@
         <SQL>
             select *
             from pos_log_master
-            where Amount = ${Amount}
+	    where Amount = :Amount
         </SQL>
         <parameters>
                 <parameter value = "Amount" name = "Стоимость: " type = "currency"/>
@@ -95,7 +84,7 @@
         <SQL>
             select *
             from pos_log_master
-            where Amount = ${Amount}
+	    where Amount = :Amount
         </SQL>
         <parameters>
                 <parameter value = "Amount" name = "Стоимость: " type = "currency"/>
@@ -105,7 +94,7 @@
         <SQL>
             select *
             from pos_log_master
-            where Amount = ${Amount}
+	    where Amount = :Amount
         </SQL>
         <parameters>
                 <parameter value = "Amount" name = "Стоимость: " type = "currency"/>
@@ -115,7 +104,7 @@
         <SQL>
             select *
             from pos_log_master
-            where Amount = ${Amount}
+	    where Amount = :Amount
         </SQL>
         <parameters>
                 <parameter value = "Amount" name = "Стоимость: " type = "currency"/>
@@ -125,7 +114,7 @@
         <SQL>
             select *
             from pos_log_master
-            where Amount = ${Amount}
+	    where Amount = :Amount
         </SQL>
         <parameters>
                 <parameter value = "Amount" name = "Стоимость: " type = "currency"/>
@@ -135,7 +124,7 @@
         <SQL>
             select *
             from pos_log_master
-            where Amount = ${Amount}
+	    where Amount = :Amount
         </SQL>
         <parameters>
                 <parameter value = "Amount" name = "Стоимость: " type = "currency"/>
@@ -145,7 +134,17 @@
         <SQL>
             select *
             from pos_log_master
-            where Amount = ${Amount}
+	    where Amount = :Amount
+        </SQL>
+        <parameters>
+                <parameter value = "Amount" name = "Стоимость: " type = "currency"/>
+        </parameters>
+  </Query>
+    <Query num = "3" name="Показать позицию по стоимости покупки" child = "" ischild = "false">
+        <SQL>
+            select *
+            from pos_log_master
+	    where Amount = :Amount
         </SQL>
         <parameters>
                 <parameter value = "Amount" name = "Стоимость: " type = "currency"/>
@@ -155,7 +154,7 @@
         <SQL>
             select *
             from pos_log_master
-            where Amount = ${Amount}
+	    where Amount = :Amount
         </SQL>
         <parameters>
                 <parameter value = "Amount" name = "Стоимость: " type = "currency"/>
