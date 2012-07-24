@@ -19,7 +19,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(ClickedFind()));
     connect(ui->HorisontalSplitter, SIGNAL(splitterMoved(int,int)), this, SLOT(movedHorisontalSplitter(int,int)));
-
 }
 
 MainWindow::~MainWindow()
@@ -58,6 +57,19 @@ void MainWindow::setXMLReader(XMLReader *p)
 void MainWindow::setSQL(SQL *p)
 {
     pSQL = p;
+}
+
+void MainWindow::setMediaPlayer(MediaPlayer *p)
+{
+    pMediaPlayer = p;
+    connect(ui->PlayButton, SIGNAL(clicked()), pMediaPlayer->getMediaObject(), SLOT(play()));
+    connect(ui->PauseButton, SIGNAL(clicked()), pMediaPlayer->getMediaObject(), SLOT(pause()));
+    connect(ui->LoadButton, SIGNAL(clicked()), pMediaPlayer, SLOT(slotLoad()));
+    connect(ui->pushButton_2, SIGNAL(clicked()), pMediaPlayer, SLOT(buttonClicked()));
+
+    pMediaPlayer->setParentForVideoWidget(ui->VideoFrame1);
+    pMediaPlayer->setSeekSlider(ui->NavigationHorizontalLayout);
+    pMediaPlayer->setVolumeSlider(ui->NavigationHorizontalLayout);
 }
 
 void MainWindow::setHeightToolBox(qint32 count_query)

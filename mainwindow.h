@@ -5,6 +5,7 @@
 
 #include "xmlreader.h"
 #include "sql.h"
+#include "mediaplayer.h"
 
 namespace Ui {
 class MainWindow;
@@ -20,6 +21,7 @@ public:
     void setPropertyToolBox();
     void setXMLReader(XMLReader *p);
     void setSQL(SQL *p);
+    void setMediaPlayer(MediaPlayer *p);
     void setHeightToolBox(qint32 count_query);
 
     Ui::MainWindow *ui;
@@ -29,6 +31,7 @@ private:
 
     XMLReader *pXMLReader;
     SQL *pSQL;
+    MediaPlayer *pMediaPlayer;
 
 signals:
 

@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui xml sql
+QT       += core gui xml sql phonon network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -17,13 +17,15 @@ SOURCES += main.cpp\
     sql.cpp \
     xmlreader.cpp \
     longintvalidator.cpp \
-    currencyvalidator.cpp
+    currencyvalidator.cpp \
+    mediaplayer.cpp
 
 HEADERS  += mainwindow.h \
     sql.h \
     xmlreader.h \
     longintvalidator.h \
-    currencyvalidator.h
+    currencyvalidator.h \
+    mediaplayer.h
 
 FORMS    += mainwindow.ui
 
