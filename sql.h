@@ -16,6 +16,7 @@ public:
     QSqlQueryModel *QueryExec();
     void SqlPrepare (const QString &query);
     void setQueryValue(const QString &param_name, const QString &value);
+    QSqlQueryModel *getSqlModel();
     
 private:
     QSqlDatabase db;

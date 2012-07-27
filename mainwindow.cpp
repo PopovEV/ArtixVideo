@@ -19,6 +19,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(ClickedFind()));
     connect(ui->HorisontalSplitter, SIGNAL(splitterMoved(int,int)), this, SLOT(movedHorisontalSplitter(int,int)));
+
+    ui->tableView->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
 }
 
 MainWindow::~MainWindow()
@@ -65,7 +67,8 @@ void MainWindow::setMediaPlayer(MediaPlayer *p)
     connect(ui->PlayButton, SIGNAL(clicked()), pMediaPlayer->getMediaObject(), SLOT(play()));
     connect(ui->PauseButton, SIGNAL(clicked()), pMediaPlayer->getMediaObject(), SLOT(pause()));
     connect(ui->LoadButton, SIGNAL(clicked()), pMediaPlayer, SLOT(slotLoad()));
-    connect(ui->pushButton_2, SIGNAL(clicked()), pMediaPlayer, SLOT(buttonClicked()));
+    connect(ui->tableView, SIGNAL(doubleClicked(QModelIndex)), pMediaPlayer->getMediaObject(), SLOT(stop()));
+    connect(ui->tableView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(getDateTimeFromCurrentRow(QModelIndex)));
 
     pMediaPlayer->setParentForVideoWidget(ui->VideoFrame1);
     pMediaPlayer->setSeekSlider(ui->NavigationHorizontalLayout);
@@ -85,6 +88,12 @@ void MainWindow::setHeightToolBox(qint32 count_query)
     ui->toolBox->resize(ui->toolBox->width(), HeightToolBox);
 }
 
+void MainWindow::setHttpDownload(HttpDownload *p)
+{
+    pHttpDownload = p;
+    connect(pHttpDownload, SIGNAL(fileDownloaded(QString, QDateTime)), pMediaPlayer, SLOT(LoadVideo(QString, QDateTime)));
+}
+
 QFormLayout *MainWindow::addItemInToolBox(const char *text)
 {
     QFrame *pFrame = new QFrame(ui->toolBox);
@@ -101,6 +110,26 @@ QFormLayout *MainWindow::addItemInToolBox(const char *text)
     setHeightToolBox(pXMLReader->getCountQuery());
 
     return pFormLayout;
+}
+
+void MainWindow::getDateTimeFromCurrentRow(QModelIndex ModelIndex)
+{
+    int currentRow = ModelIndex.row();
+
+    QSqlQueryModel *pSqlModel = pSQL->getSqlModel();
+    qint32 columnCount = pSqlModel->columnCount();
+
+    for(int i = 0; i < columnCount; ++i)
+    {
+        QString headerData =  pSqlModel->headerData(i, Qt::Horizontal).toString().toUpper();
+        if(headerData == tr("ВРЕМЯ"))
+        {
+            QModelIndex newModelIndex = pSqlModel->index(currentRow, i, QModelIndex());
+
+            pHttpDownload->setUrl((pSqlModel->data(newModelIndex, Qt::DisplayRole).toDateTime()));
+            return;
+        }
+    }
 }
 
 void MainWindow::ClickedFind()

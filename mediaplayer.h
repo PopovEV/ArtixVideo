@@ -21,6 +21,8 @@ private:
     Phonon::SeekSlider  *pSeekSlider;
     Phonon::VolumeSlider *pVolumeSlider;
 
+    qint64 timeDifference;
+
 
 public:
     explicit MediaPlayer(QWidget *parent = 0);
@@ -36,7 +38,9 @@ signals:
     
 public slots:
     void slotLoad();
-    void buttonClicked();//тест
+
+    void LoadVideo(const QString &path, const QDateTime &selectDateTime);
+    void seek( Phonon::State newstate, Phonon::State oldstate);
     
 };
 

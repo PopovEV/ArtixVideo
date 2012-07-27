@@ -6,6 +6,7 @@
 #include "xmlreader.h"
 #include "sql.h"
 #include "mediaplayer.h"
+#include "httpdownload.h"
 
 namespace Ui {
 class MainWindow;
@@ -23,6 +24,7 @@ public:
     void setSQL(SQL *p);
     void setMediaPlayer(MediaPlayer *p);
     void setHeightToolBox(qint32 count_query);
+    void setHttpDownload(HttpDownload *p);
 
     Ui::MainWindow *ui;
 
@@ -32,6 +34,7 @@ private:
     XMLReader *pXMLReader;
     SQL *pSQL;
     MediaPlayer *pMediaPlayer;
+    HttpDownload *pHttpDownload;
 
 signals:
 
@@ -40,6 +43,7 @@ public slots:
     void ClickedFind();
     void movedHorisontalSplitter(int pos, int index);
     QFormLayout *addItemInToolBox(const char* text);
+    void getDateTimeFromCurrentRow(QModelIndex ModelIndex);
 
 protected:
     virtual void resizeEvent(QResizeEvent *pe);

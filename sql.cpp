@@ -56,3 +56,8 @@ void SQL::setQueryValue(const QString &param_name, const QString &value)
 {
     sqlquery.bindValue(param_name, value);
 }
+
+QSqlQueryModel *SQL::getSqlModel()
+{
+    return sqlmodel;
+}

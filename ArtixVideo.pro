@@ -18,14 +18,18 @@ SOURCES += main.cpp\
     xmlreader.cpp \
     longintvalidator.cpp \
     currencyvalidator.cpp \
-    mediaplayer.cpp
+    mediaplayer.cpp \
+    httpdialog.cpp \
+    httpdownload.cpp
 
 HEADERS  += mainwindow.h \
     sql.h \
     xmlreader.h \
     longintvalidator.h \
     currencyvalidator.h \
-    mediaplayer.h
+    mediaplayer.h \
+    httpdialog.h \
+    httpdownload.h
 
 FORMS    += mainwindow.ui
 

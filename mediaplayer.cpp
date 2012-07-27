@@ -11,7 +11,8 @@ MediaPlayer::MediaPlayer(QWidget *parent) :
     createPath(pMediaObject, pVideoWidget);
     createPath(pMediaObject, pAudioOutput);
 
-    connect(this, SIGNAL(seekChanged(qint64)), pMediaObject, SLOT(seek(qint64))); //тест
+    connect(this, SIGNAL(seekChanged(qint64)), pMediaObject, SLOT(seek(qint64)));
+    connect(pMediaObject, SIGNAL(stateChanged(Phonon::State,Phonon::State)), this, SLOT(seek(Phonon::State,Phonon::State)));
 }
 
 MediaObject *MediaPlayer::getMediaObject()
@@ -54,7 +55,24 @@ void MediaPlayer::slotLoad()
     }
 }
 
-void MediaPlayer::buttonClicked()//тест
+void MediaPlayer::LoadVideo(const QString &path, const QDateTime &selectDateTime)
 {
-    emit seekChanged(pMediaObject->currentTime()+1000000);
+    if (!path.isEmpty())
+    {
+        QTime timeStartVideo;
+        timeStartVideo = QTime::fromString(path.mid(9, 6), "hhmmss");
+        timeDifference = timeStartVideo.msecsTo(selectDateTime.time());
+        //timeDifference -= 5000;
+
+        pMediaObject->setCurrentSource(MediaSource(path));
+        emit pMediaObject->play();
+    }
+}
+
+void MediaPlayer::seek(State newstate, State oldstate)
+{
+    if(newstate == Phonon::PlayingState || newstate == Phonon::BufferingState || newstate == Phonon::PausedState)
+    {
+        emit seekChanged(timeDifference);
+    }
 }

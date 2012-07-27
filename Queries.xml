@@ -2,7 +2,7 @@
 <QueryList>
   <Query num = "1" name = "Показать позиции за период времени" child = "" ischild = "false">
         <SQL>
-            select *
+	    select *, date_begin AS "Время"
             from pos_log_master
 	    where date_begin &gt;= :date_beg and date_end  &lt;= :date_end
         </SQL>
@@ -13,7 +13,7 @@
   </Query>
   <Query num = "2" name="Показать позицию по номеру чека" child = "" ischild = "false">
         <SQL>
-            select *
+	    select *, date_begin AS "Время"
 	    from pos_log_master
 	    where CheckNumber = :CheckNum
         </SQL>
@@ -23,7 +23,7 @@
   </Query>
   <Query num = "3" name="Показать позицию по стоимости покупки" child = "" ischild = "false">
         <SQL>
-            select *
+	    select *, date_begin AS "Время"
             from pos_log_master
 			where Amount = :Amount
         </SQL>
@@ -43,21 +43,37 @@
   </Query>
     <Query num = "5" name="Все субтитры" child = "" ischild = "false">
         <SQL>
-	    select *
+	    select *, STIME AS "Время"
 	    from subtitles
         </SQL>
         <parameters>
 		<!-- <parameter value = "Amount" name = "Стоимость: " type = "currency"/> -->
         </parameters>
   </Query>
-    <Query num = "3" name="Показать позицию по стоимости покупки" child = "" ischild = "false">
+    <Query num = "6" name="Информация о чеке" child = "" ischild = "true">
         <SQL>
-            select *
-            from pos_log_master
-	    where Amount = :Amount
+				select
+					ddate as "Время",
+					case FunctionNumber
+					when 1007 then CONCAT('Подитог:' , cast(Amount as CHAR(16)) , ' р.')
+					when 1010 then CONCAT(ItemName  , ' ' , cast(Price as CHAR(16)) , ' р. * ' , cast(Quantity as CHAR(16)) , ' = ' , cast(Amount as CHAR(16)) , 'р.')
+					when 1011 then CONCAT('Возврат: ' , ' ' , ItemName , ' ' , cast(Price as CHAR(16)) , ' р. * ' , cast(Quantity as CHAR(16)) , ' = ' , cast(Amount as CHAR(16)) , 'р.')
+					when 1012 then CONCAT('Сторно: ' , ' ' , ItemName , ' ' , cast(Price as CHAR(16)) , ' р. * ' , cast(Quantity as CHAR(16)) , ' = ' , cast(Amount as CHAR(16)) , 'р.')
+					when 1013 then CONCAT('Сторно возврата: ' , ' ' , ItemName , ' ' , cast(Price as CHAR(16)) , ' р. * ' , cast(Quantity as CHAR(16)) , ' = ' , cast(Amount as CHAR(16)) , 'р.')
+					when 1014 then CONCAT('Оплата :' , cast(Amount as CHAR(16)) , ' ' , ItemName)
+					when 1015 then CONCAT('Сторно оплаты :' , cast(Amount as CHAR(16)) , ' ' , ItemName)
+					when 1016 then CONCAT('Сдача :' , cast(Amount as CHAR(16)) , ' ' , ItemName)
+					when 1022 then CONCAT('Скидка :' , DiscountName , ' ' , cast(DiscountPercent as CHAR(16)) , '%  , ' , cast(DiscountSum as CHAR(16)) , 'р. ' , 
+					case PositionDiscount when 1 then ' (на позицию) ' else ' (на чек) ' end)
+					else CONCAT('Не определено: :' , cast(FunctionNumber as CHAR(16)))
+					end as "Позиция",
+					fraction as "мс"
+					from POS_LOG_DETAIL 
+					where id = :master_id AND FunctionNumber between 1007 and 1022
+					order by id_string
         </SQL>
         <parameters>
-                <parameter value = "Amount" name = "Стоимость: " type = "currency"/>
+                <parameter value = "master_id" name = "Мастер id:" type = "int"/>
         </parameters>
   </Query>
     <Query num = "3" name="Показать позицию по стоимости покупки" child = "" ischild = "false">

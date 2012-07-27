@@ -215,7 +215,7 @@
          <property name="frameShadow">
           <enum>QFrame::Raised</enum>
          </property>
-         <widget class="QWidget" name="">
+         <widget class="QWidget" name="layoutWidget">
           <property name="geometry">
            <rect>
             <x>0</x>
@@ -302,13 +302,6 @@
             <widget class="QPushButton" name="LoadButton">
              <property name="text">
               <string>Открыть</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="pushButton_2">
-             <property name="text">
-              <string>Далее на 16,6 мин</string>
              </property>
             </widget>
            </item>
