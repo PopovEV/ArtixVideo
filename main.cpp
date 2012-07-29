@@ -15,26 +15,25 @@ int main(int argc, char *argv[])
 
     QApplication a(argc, argv);
 
-    XMLReader *xml_reader = new XMLReader();
+//    XMLReader *xml_reader = new XMLReader();
 
-    SQL * sql_db = new SQL();
+//    SQL * sql_db = new SQL();
 
-    MediaPlayer *pMediaPlayer = new MediaPlayer();
+//    MediaPlayer *pMediaPlayer = new MediaPlayer();
 
-    HttpDownload *pHttpDownload = new HttpDownload();
+//    HttpDownload *pHttpDownload = new HttpDownload();
 
     MainWindow* w = new MainWindow();
-    w->setAttribute(Qt::WA_AlwaysShowToolTips, true);
-    w->setXMLReader(xml_reader);
-    w->setSQL(sql_db);
-    w->setMediaPlayer(pMediaPlayer);
-    w->setHttpDownload(pHttpDownload);
+//    w->setAttribute(Qt::WA_AlwaysShowToolTips, true);
+//    w->setXMLReader(xml_reader);
+//    w->setSQL(sql_db);
+//    w->setMediaPlayer(pMediaPlayer);
+//    w->setHttpDownload(pHttpDownload);
 
 
-    xml_reader->ReadFile("d:/POVT/NIRS/Projects/ArtixVideo/Queries.xml");
-    sql_db->createConnection();
-
-    w->show();
+//    xml_reader->ReadFile("d:/POVT/NIRS/Projects/ArtixVideo/Queries.xml");
+//    sql_db->createConnection();
+    w->showMaximized();
 
     return a.exec();
 }

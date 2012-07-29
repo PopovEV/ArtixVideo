@@ -9,18 +9,18 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    int count = ui->toolBox->count();
-    for(int i = 0; i < count; ++i)
-        ui->toolBox->removeItem(i);
+//    int count = ui->toolBox->count();
+//    for(int i = 0; i < count; ++i)
+//        ui->toolBox->removeItem(i);
 
-    HeightToolBox = this->height() * 2/3 - 55;
+//    HeightToolBox = this->height() * 2/3 - 55;
 
-    setPropertyToolBox();
+//    setPropertyToolBox();
 
-    connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(ClickedFind()));
-    connect(ui->HorisontalSplitter, SIGNAL(splitterMoved(int,int)), this, SLOT(movedHorisontalSplitter(int,int)));
+//    connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(ClickedFind()));
+//    connect(ui->HorisontalSplitter, SIGNAL(splitterMoved(int,int)), this, SLOT(movedHorisontalSplitter(int,int)));
 
-    ui->tableView->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
+//    ui->tableView->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
 }
 
 MainWindow::~MainWindow()
@@ -28,27 +28,27 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::setPropertyToolBox()
-{
-    ui->frameToolBox->resize(this->width() / 3, this->height() * 2 / 3);
+//void MainWindow::setPropertyToolBox()
+//{
+//    ui->frameToolBox->resize(this->width() / 3, this->height() * 2 / 3);
 
-    ui->scrollArea->resize(ui->frameToolBox->width(), ui->frameToolBox->height() - 50);
+//    ui->scrollArea->resize(ui->frameToolBox->width(), ui->frameToolBox->height() - 50);
 
-    ui->toolBox->resize(ui->scrollArea->width() - 20, HeightToolBox);
-    ui->toolBox->setStyleSheet(" QToolBox::tab { font: bold; color: green } ");
+//    ui->toolBox->resize(ui->scrollArea->width() - 20, HeightToolBox);
+//    ui->toolBox->setStyleSheet(" QToolBox::tab { font: bold; color: green } ");
 
-    ui->HorisontalSplitter->resize(this->width(), this->height() * 2 / 3);
+//    ui->HorisontalSplitter->resize(this->width(), this->height() * 2 / 3);
 
-    QList<int> sizes_widgets;
-    sizes_widgets << ui->scrollArea->width() << this->width() - ui->scrollArea->width();
-    ui->HorisontalSplitter->setSizes(sizes_widgets);
+//    QList<int> sizes_widgets;
+//    sizes_widgets << ui->scrollArea->width() << this->width() - ui->scrollArea->width();
+//    ui->HorisontalSplitter->setSizes(sizes_widgets);
 
-    ui->VerticalSplitter->resize(this->width(), this->height() - menuBar()->height());
+//    ui->VerticalSplitter->resize(this->width(), this->height() - menuBar()->height());
 
-    sizes_widgets.clear();
-    sizes_widgets << this->height() * 2 / 3 << this->height() * 1 / 3;
-    ui->VerticalSplitter->setSizes(sizes_widgets);
-}
+//    sizes_widgets.clear();
+//    sizes_widgets << this->height() * 2 / 3 << this->height() * 1 / 3;
+//    ui->VerticalSplitter->setSizes(sizes_widgets);
+//}
 
 void MainWindow::setXMLReader(XMLReader *p)
 {
@@ -64,28 +64,28 @@ void MainWindow::setSQL(SQL *p)
 void MainWindow::setMediaPlayer(MediaPlayer *p)
 {
     pMediaPlayer = p;
-    connect(ui->PlayButton, SIGNAL(clicked()), pMediaPlayer->getMediaObject(), SLOT(play()));
-    connect(ui->PauseButton, SIGNAL(clicked()), pMediaPlayer->getMediaObject(), SLOT(pause()));
-    connect(ui->LoadButton, SIGNAL(clicked()), pMediaPlayer, SLOT(slotLoad()));
-    connect(ui->tableView, SIGNAL(doubleClicked(QModelIndex)), pMediaPlayer->getMediaObject(), SLOT(stop()));
-    connect(ui->tableView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(getDateTimeFromCurrentRow(QModelIndex)));
+//    connect(ui->PlayButton, SIGNAL(clicked()), pMediaPlayer->getMediaObject(), SLOT(play()));
+//    connect(ui->PauseButton, SIGNAL(clicked()), pMediaPlayer->getMediaObject(), SLOT(pause()));
+//    connect(ui->LoadButton, SIGNAL(clicked()), pMediaPlayer, SLOT(slotLoad()));
+//    connect(ui->tableView, SIGNAL(doubleClicked(QModelIndex)), pMediaPlayer->getMediaObject(), SLOT(stop()));
+//    connect(ui->tableView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(getDateTimeFromCurrentRow(QModelIndex)));
 
-    pMediaPlayer->setParentForVideoWidget(ui->VideoFrame1);
-    pMediaPlayer->setSeekSlider(ui->NavigationHorizontalLayout);
-    pMediaPlayer->setVolumeSlider(ui->NavigationHorizontalLayout);
+//    pMediaPlayer->setParentForVideoWidget(ui->VideoFrame1);
+//    pMediaPlayer->setSeekSlider(ui->NavigationHorizontalLayout);
+//    pMediaPlayer->setVolumeSlider(ui->NavigationHorizontalLayout);
 }
 
 void MainWindow::setHeightToolBox(qint32 count_query)
 {
-    HeightToolBox = count_query * 45;
+//    HeightToolBox = count_query * 45;
 
-    if(HeightToolBox < ui->toolBox->height())
-    {
-        HeightToolBox = ui->toolBox->height();
-        return;
-    }
+//    if(HeightToolBox < ui->toolBox->height())
+//    {
+//        HeightToolBox = ui->toolBox->height();
+//        return;
+//    }
 
-    ui->toolBox->resize(ui->toolBox->width(), HeightToolBox);
+//    ui->toolBox->resize(ui->toolBox->width(), HeightToolBox);
 }
 
 void MainWindow::setHttpDownload(HttpDownload *p)
@@ -96,102 +96,102 @@ void MainWindow::setHttpDownload(HttpDownload *p)
 
 QFormLayout *MainWindow::addItemInToolBox(const char *text)
 {
-    QFrame *pFrame = new QFrame(ui->toolBox);
-    pFrame->setFrameShape(QFrame::Box);
-    pFrame->setObjectName("FrameIntoToolBox");
+//    QFrame *pFrame = new QFrame(ui->toolBox);
+//    pFrame->setFrameShape(QFrame::Box);
+//    pFrame->setObjectName("FrameIntoToolBox");
 
-    QFormLayout *pFormLayout = new QFormLayout(pFrame);
-    pFormLayout->setObjectName("FormLayout");
+//    QFormLayout *pFormLayout = new QFormLayout(pFrame);
+//    pFormLayout->setObjectName("FormLayout");
 
-    QWidget *newItem = ui->toolBox->widget(ui->toolBox->addItem(pFrame, tr(text)));
-    newItem->setToolTip(QString(tr(text)));
-    newItem->setObjectName("AddItem");
+//    QWidget *newItem = ui->toolBox->widget(ui->toolBox->addItem(pFrame, tr(text)));
+//    newItem->setToolTip(QString(tr(text)));
+//    newItem->setObjectName("AddItem");
 
-    setHeightToolBox(pXMLReader->getCountQuery());
+//    setHeightToolBox(pXMLReader->getCountQuery());
 
-    return pFormLayout;
+//    return pFormLayout;
 }
 
 void MainWindow::getDateTimeFromCurrentRow(QModelIndex ModelIndex)
 {
-    int currentRow = ModelIndex.row();
+//    int currentRow = ModelIndex.row();
 
-    QSqlQueryModel *pSqlModel = pSQL->getSqlModel();
-    qint32 columnCount = pSqlModel->columnCount();
+//    QSqlQueryModel *pSqlModel = pSQL->getSqlModel();
+//    qint32 columnCount = pSqlModel->columnCount();
 
-    for(int i = 0; i < columnCount; ++i)
-    {
-        QString headerData =  pSqlModel->headerData(i, Qt::Horizontal).toString().toUpper();
-        if(headerData == tr("ВРЕМЯ"))
-        {
-            QModelIndex newModelIndex = pSqlModel->index(currentRow, i, QModelIndex());
+//    for(int i = 0; i < columnCount; ++i)
+//    {
+//        QString headerData =  pSqlModel->headerData(i, Qt::Horizontal).toString().toUpper();
+//        if(headerData == tr("ВРЕМЯ"))
+//        {
+//            QModelIndex newModelIndex = pSqlModel->index(currentRow, i, QModelIndex());
 
-            pHttpDownload->setUrl((pSqlModel->data(newModelIndex, Qt::DisplayRole).toDateTime()));
-            return;
-        }
-    }
+//            pHttpDownload->setUrl((pSqlModel->data(newModelIndex, Qt::DisplayRole).toDateTime()));
+//            return;
+//        }
+//    }
 }
 
 void MainWindow::ClickedFind()
 {
-    int index = ui->toolBox->currentIndex();
+//    int index = ui->toolBox->currentIndex();
 
-    Query currentQuery = pXMLReader->getQuery(index);
+//    Query currentQuery = pXMLReader->getQuery(index);
 
-    pSQL->SqlPrepare(currentQuery.sql);
+//    pSQL->SqlPrepare(currentQuery.sql);
 
-    QFormLayout *pFormLayout = dynamic_cast<QFormLayout *> (ui->toolBox->currentWidget()->children().first());
+//    QFormLayout *pFormLayout = dynamic_cast<QFormLayout *> (ui->toolBox->currentWidget()->children().first());
 
-    for(int i = 0; i < currentQuery.ParameterList.size(); ++i)
-    {
-        QLayoutItem *pLayoutItem = dynamic_cast<QLayoutItem *> (pFormLayout->itemAt(i, QFormLayout::FieldRole));
+//    for(int i = 0; i < currentQuery.ParameterList.size(); ++i)
+//    {
+//        QLayoutItem *pLayoutItem = dynamic_cast<QLayoutItem *> (pFormLayout->itemAt(i, QFormLayout::FieldRole));
 
-        QString str;
+//        QString str;
 
-        if(QDateEdit *pDateEdit = dynamic_cast<QDateEdit *> (pLayoutItem->widget()))
-        {
-            str = pDateEdit->date().toString("yyyy-MM-dd");
-        }
-        else
-            if(QDateTimeEdit *pDateTimeEdit = dynamic_cast<QDateTimeEdit *> (pLayoutItem->widget()))
-            {
-                str = pDateTimeEdit->dateTime().toString("yyyy-MM-dd hh:mm:ss");
-            }
-            else
-                if(QLineEdit *pLineEdit = dynamic_cast<QLineEdit *> (pLayoutItem->widget()))
-                {
-                    str = pLineEdit->text();
-                }
-        qDebug() << currentQuery.ParameterList.at(i).value;
-        pSQL->setQueryValue(currentQuery.ParameterList.at(i).value, str);
-    }
+//        if(QDateEdit *pDateEdit = dynamic_cast<QDateEdit *> (pLayoutItem->widget()))
+//        {
+//            str = pDateEdit->date().toString("yyyy-MM-dd");
+//        }
+//        else
+//            if(QDateTimeEdit *pDateTimeEdit = dynamic_cast<QDateTimeEdit *> (pLayoutItem->widget()))
+//            {
+//                str = pDateTimeEdit->dateTime().toString("yyyy-MM-dd hh:mm:ss");
+//            }
+//            else
+//                if(QLineEdit *pLineEdit = dynamic_cast<QLineEdit *> (pLayoutItem->widget()))
+//                {
+//                    str = pLineEdit->text();
+//                }
+//        qDebug() << currentQuery.ParameterList.at(i).value;
+//        pSQL->setQueryValue(currentQuery.ParameterList.at(i).value, str);
+//    }
 
-    ui->tableView->setModel(pSQL->QueryExec());
-    ui->tableView->show();
+//    ui->tableView->setModel(pSQL->QueryExec());
+//    ui->tableView->show();
 }
 
 void MainWindow::movedHorisontalSplitter(int pos, int index)
 {
 
-    ui->scrollArea->resize(pos, ui->scrollArea->height());
-    ui->toolBox->resize(pos - 20, ui->toolBox->height());
-    ui->pushButton->move(pos / 2 - ui->pushButton->width() / 2, ui->pushButton->y());
+//    ui->scrollArea->resize(pos, ui->scrollArea->height());
+//    ui->toolBox->resize(pos - 20, ui->toolBox->height());
+//    ui->pushButton->move(pos / 2 - ui->pushButton->width() / 2, ui->pushButton->y());
 
 }
 
 void MainWindow::resizeEvent(QResizeEvent *pe)
 {
-    ui->VerticalSplitter->resize(pe->size().width(), pe->size().height() - menuBar()->height() - statusBar()->height());
-    ui->HorisontalSplitter->resize(pe->size().width(), pe->size().height() * 2/3);
+//    ui->VerticalSplitter->resize(pe->size().width(), pe->size().height() - menuBar()->height() - statusBar()->height());
+//    ui->HorisontalSplitter->resize(pe->size().width(), pe->size().height() * 2/3);
 
-    QList<int> sizes_widgets;
-    sizes_widgets << this->height() * 2 / 3 << this->height() * 1 / 3;
-    ui->VerticalSplitter->setSizes(sizes_widgets);
+//    QList<int> sizes_widgets;
+//    sizes_widgets << this->height() * 2 / 3 << this->height() * 1 / 3;
+//    ui->VerticalSplitter->setSizes(sizes_widgets);
 
-    ui->scrollArea->resize(ui->frameToolBox->width(), ui->frameToolBox->height() - 50);
-    ui->toolBox->resize(ui->scrollArea->width() - 20, HeightToolBox);
+//    ui->scrollArea->resize(ui->frameToolBox->width(), ui->frameToolBox->height() - 50);
+//    ui->toolBox->resize(ui->scrollArea->width() - 20, HeightToolBox);
 
-    qint32 x_button = (ui->frameToolBox->width() - ui->pushButton->width()) / 2;
-    qint32 y_button = ui->scrollArea->height() + (ui->frameToolBox->height() - ui->scrollArea->height()) / 2 - ui->pushButton->height() / 2;
-    ui->pushButton->move(x_button, y_button);
+//    qint32 x_button = (ui->frameToolBox->width() - ui->pushButton->width()) / 2;
+//    qint32 y_button = ui->scrollArea->height() + (ui->frameToolBox->height() - ui->scrollArea->height()) / 2 - ui->pushButton->height() / 2;
+//    ui->pushButton->move(x_button, y_button);
 }
