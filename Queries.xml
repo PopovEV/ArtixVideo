@@ -1,6 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <QueryList>
-  <Query num = "1" name = "Показать позиции за период времени" child = "" ischild = "false">
+  <Query num = "1" name = "Показать позиции за период времени" child = "" ischild = "false" TabName = "Чеки">
+	<description>
+	    Для просмотра всех позиций за период времени
+	    введите начальную и конечную дату и время.
+	</description>
         <SQL>
 	    select *, date_begin AS "Время"
             from pos_log_master
@@ -11,17 +15,23 @@
 		<parameter value = "date_end" name = "Конечная дата и время: " type = "datetime"/>
 	</parameters>
   </Query>
-  <Query num = "2" name="Показать позицию по номеру чека" child = "" ischild = "false">
+  <Query num = "2" name="Показать позицию по номеру чека" child = "" ischild = "false" TabName = "Чеки">
+	  <description>
+
+	  </description>
         <SQL>
 	    select *, date_begin AS "Время"
 	    from pos_log_master
 	    where CheckNumber = :CheckNum
-        </SQL>
+	</SQL>
 	<parameters>
 		<parameter value = "CheckNum" name = "Номер чека: " type = "int"/>
 	</parameters>
   </Query>
-  <Query num = "3" name="Показать позицию по стоимости покупки" child = "" ischild = "false">
+  <Query num = "3" name="Показать позицию по стоимости покупки" child = "" ischild = "false" TabName = "Товары">
+	  <description>
+
+	  </description>
         <SQL>
 	    select *, date_begin AS "Время"
             from pos_log_master
@@ -31,8 +41,11 @@
                 <parameter value = "Amount" name = "Стоимость: " type = "currency"/>
         </parameters>
   </Query>
-  <Query num = "4" name="Показать позицию по стоимости покупки" child = "" ischild = "false">
-        <SQL>
+  <Query num = "4" name="Показать позицию по стоимости покупки" child = "" ischild = "false" TabName = "Товары">
+	  <description>
+
+	  </description>
+	<SQL>
             select *
             from pos_log_master
 			where Amount = :Amount
@@ -41,7 +54,10 @@
 		<parameter value = "Amount" name = "Стоимость: " type = "date"/>
         </parameters>
   </Query>
-    <Query num = "5" name="Все субтитры" child = "" ischild = "false">
+    <Query num = "5" name="Все субтитры" child = "" ischild = "false" TabName = "Субтитры">
+	<description>
+
+	</description>
         <SQL>
 	    select *, STIME AS "Время"
 	    from subtitles
@@ -50,7 +66,10 @@
 		<!-- <parameter value = "Amount" name = "Стоимость: " type = "currency"/> -->
         </parameters>
   </Query>
-    <Query num = "6" name="Информация о чеке" child = "" ischild = "true">
+    <Query num = "6" name="Информация о чеке" child = "" ischild = "true" TabName = "Чеки">
+	<description>
+
+	</description>
         <SQL>
 				select
 					ddate as "Время",
@@ -75,105 +94,5 @@
         <parameters>
                 <parameter value = "master_id" name = "Мастер id:" type = "int"/>
         </parameters>
-  </Query>
-    <Query num = "3" name="Показать позицию по стоимости покупки" child = "" ischild = "false">
-        <SQL>
-            select *
-            from pos_log_master
-	    where Amount = :Amount
-        </SQL>
-        <parameters>
-                <parameter value = "Amount" name = "Стоимость: " type = "currency"/>
-        </parameters>
-  </Query>
-    <Query num = "3" name="Показать позицию по стоимости покупки" child = "" ischild = "false">
-        <SQL>
-            select *
-            from pos_log_master
-	    where Amount = :Amount
-        </SQL>
-        <parameters>
-                <parameter value = "Amount" name = "Стоимость: " type = "currency"/>
-        </parameters>
-  </Query>
-    <Query num = "3" name="Показать позицию по стоимости покупки" child = "" ischild = "false">
-        <SQL>
-            select *
-            from pos_log_master
-	    where Amount = :Amount
-        </SQL>
-        <parameters>
-                <parameter value = "Amount" name = "Стоимость: " type = "currency"/>
-        </parameters>
-  </Query>
-    <Query num = "3" name="Показать позицию по стоимости покупки" child = "" ischild = "false">
-        <SQL>
-            select *
-            from pos_log_master
-	    where Amount = :Amount
-        </SQL>
-        <parameters>
-                <parameter value = "Amount" name = "Стоимость: " type = "currency"/>
-        </parameters>
-  </Query>
-    <Query num = "3" name="Показать позицию по стоимости покупки" child = "" ischild = "false">
-        <SQL>
-            select *
-            from pos_log_master
-	    where Amount = :Amount
-        </SQL>
-        <parameters>
-                <parameter value = "Amount" name = "Стоимость: " type = "currency"/>
-        </parameters>
-  </Query>
-    <Query num = "3" name="Показать позицию по стоимости покупки" child = "" ischild = "false">
-        <SQL>
-            select *
-            from pos_log_master
-	    where Amount = :Amount
-        </SQL>
-        <parameters>
-                <parameter value = "Amount" name = "Стоимость: " type = "currency"/>
-        </parameters>
-  </Query>
-    <Query num = "3" name="Показать позицию по стоимости покупки" child = "" ischild = "false">
-        <SQL>
-            select *
-            from pos_log_master
-	    where Amount = :Amount
-        </SQL>
-        <parameters>
-                <parameter value = "Amount" name = "Стоимость: " type = "currency"/>
-        </parameters>
-  </Query>
-    <Query num = "3" name="Показать позицию по стоимости покупки" child = "" ischild = "false">
-        <SQL>
-            select *
-            from pos_log_master
-	    where Amount = :Amount
-        </SQL>
-        <parameters>
-                <parameter value = "Amount" name = "Стоимость: " type = "currency"/>
-        </parameters>
-  </Query>
-    <Query num = "3" name="Показать позицию по стоимости покупки" child = "" ischild = "false">
-        <SQL>
-            select *
-            from pos_log_master
-	    where Amount = :Amount
-        </SQL>
-        <parameters>
-                <parameter value = "Amount" name = "Стоимость: " type = "currency"/>
-        </parameters>
-  </Query>  
-  <Query num = "3" name="Показать позицию по стоимости покупки" child = "" ischild = "false">
-        <SQL>
-            select *
-            from pos_log_master
-	    where Amount = :Amount
-        </SQL>
-        <parameters>
-                <parameter value = "Amount" name = "Стоимость: " type = "currency"/>
-        </parameters>
-  </Query>  
- </QueryList>
+    </Query>
+</QueryList>

@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 
 #include <QtGui>
+#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -9,13 +10,9 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-//    int count = ui->toolBox->count();
-//    for(int i = 0; i < count; ++i)
-//        ui->toolBox->removeItem(i);
-
-//    HeightToolBox = this->height() * 2/3 - 55;
-
-//    setPropertyToolBox();
+    CreateInterface();  // создаем интерфейс главного окна
+//    if(QFile::exists("DockProperties.set"))
+//        loadLayout();
 
 //    connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(ClickedFind()));
 //    connect(ui->HorisontalSplitter, SIGNAL(splitterMoved(int,int)), this, SLOT(movedHorisontalSplitter(int,int)));
@@ -28,32 +25,225 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-//void MainWindow::setPropertyToolBox()
-//{
-//    ui->frameToolBox->resize(this->width() / 3, this->height() * 2 / 3);
+void MainWindow::CreateInterface()
+{
+    // создаем интерфейс главного окна
+    QMainWindow::setCorner(Qt::TopLeftCorner, Qt::TopDockWidgetArea);
 
-//    ui->scrollArea->resize(ui->frameToolBox->width(), ui->frameToolBox->height() - 50);
+    pDWVideo = new DockWidget(tr("Видео"), this);
+    pDWVideo->setObjectName("DWVideo");
+    pDWVideo->setAllowedAreas(Qt::TopDockWidgetArea);
+    pDWVideo->setFloating(false);
+    pDWVideo->setFeatures(QDockWidget::NoDockWidgetFeatures);
+    setCentralWidget(pDWVideo);
+//    addDockWidget(Qt::TopDockWidgetArea, );
 
-//    ui->toolBox->resize(ui->scrollArea->width() - 20, HeightToolBox);
-//    ui->toolBox->setStyleSheet(" QToolBox::tab { font: bold; color: green } ");
+    QMainWindow::setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
 
-//    ui->HorisontalSplitter->resize(this->width(), this->height() * 2 / 3);
+    pDWEvent = new DockWidget(tr("События"), this);
+    pDWEvent->setObjectName("DWVideo");
+    pDWEvent->setAllowedAreas(Qt::RightDockWidgetArea);
+    pDWEvent->setFloating(false);
+    pDWEvent->setFeatures(QDockWidget::NoDockWidgetFeatures);
+    addDockWidget(Qt::RightDockWidgetArea, pDWEvent);
 
-//    QList<int> sizes_widgets;
-//    sizes_widgets << ui->scrollArea->width() << this->width() - ui->scrollArea->width();
-//    ui->HorisontalSplitter->setSizes(sizes_widgets);
+    QMainWindow::setCorner(Qt::TopLeftCorner, Qt::LeftDockWidgetArea);
 
-//    ui->VerticalSplitter->resize(this->width(), this->height() - menuBar()->height());
+    pDWQueries = new DockWidget(tr("Запросы"), this);
+    pDWQueries->setObjectName("DWVideo");
+    pDWQueries->setAllowedAreas(Qt::LeftDockWidgetArea);
+    pDWQueries->setFloating(false);
+    pDWQueries->setFeatures(QDockWidget::NoDockWidgetFeatures);
+    addDockWidget(Qt::LeftDockWidgetArea, pDWQueries);
 
-//    sizes_widgets.clear();
-//    sizes_widgets << this->height() * 2 / 3 << this->height() * 1 / 3;
-//    ui->VerticalSplitter->setSizes(sizes_widgets);
-//}
+    QMainWindow::setCorner(Qt::BottomRightCorner, Qt::BottomDockWidgetArea);
+
+    pDWResult = new DockWidget(tr("Результаты поиска"), this);
+    pDWResult->setObjectName("DWVideo");
+    pDWResult->setAllowedAreas(Qt::BottomDockWidgetArea);
+    pDWResult->setFloating(false);
+    pDWResult->setFeatures(QDockWidget::NoDockWidgetFeatures);
+    addDockWidget(Qt::BottomDockWidgetArea, pDWResult);
+
+    /*
+     *Создаем TabWidget для группировки запросов по тематике
+    */
+    pTWQueries = new QTabWidget();
+    pTWQueries->setTabPosition(QTabWidget::West);
+
+    QVBoxLayout *pVBL = new QVBoxLayout();
+    pVBL->addWidget(pTWQueries);
+
+    QFrame *pFrame = new QFrame();
+    pDWQueries->setWidget(pFrame);
+
+    pFrame->setLayout(pVBL);
+
+    // Кнопка выполнения запроса
+    pPBExecQuery = new QPushButton(tr("Выполнить запрос"));
+    pPBExecQuery->setFixedWidth(150);
+    pVBL->addWidget(pPBExecQuery, 1);
+    pVBL->setAlignment(pPBExecQuery, Qt::AlignHCenter);
+}
+
+int MainWindow::addTabQueries(QString name)
+{
+    QFrame *pF = new QFrame();
+    QVBoxLayout *pVBL = new QVBoxLayout();
+    QComboBox *pCB = new QComboBox();
+    QTextEdit *pTE = new QTextEdit();
+    QGroupBox *pGB = new QGroupBox(tr("Параметры"));
+
+    pTE->setDisabled(true);
+    // не позволяем длинным строкам расширять виджет(в середине длинной строки вставляется троеточие)
+    pCB->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLength);
+
+    // помещаем указатели в лист для дальнейшего использования
+    ListPointsComboBoxQuery.push_back(pCB);
+    ListPointsDescription.push_back(pTE);
+    ListPointsGroupBoxQuery.push_back(pGB);
+
+    // добавляем вкладку
+    int index;
+    index = pTWQueries->addTab(pF, name);
+
+    pVBL->addWidget(new QLabel(tr("Выберите запрос:")));
+    pVBL->addWidget(pCB, 1);
+    pVBL->addWidget(pTE, 1);
+    pVBL->addWidget(pGB, 3);
+    pF->setLayout(pVBL);
+
+    return index;
+}
+
+QWidget *MainWindow::createInputBox(const QString *type)
+{
+    if(type->toUpper() == "INT")
+    {
+        LongIntValidator *pLongIntValidator = new LongIntValidator();
+
+        QLineEdit *pLineEdit = new QLineEdit();
+        pLineEdit->setValidator(pLongIntValidator);
+
+        return pLineEdit;
+    }
+    else
+        if(type->toUpper() == "CHAR")
+        {
+            QLineEdit *pLineEdit = new QLineEdit();
+
+            return pLineEdit;
+        }
+        else
+            if(type->toUpper() == "CURRENCY")
+            {
+                CurrencyValidator *pCurrencyValidator = new CurrencyValidator();
+
+                QLineEdit *pLineEdit = new QLineEdit();
+                pLineEdit->setValidator(pCurrencyValidator);
+
+                return pLineEdit;
+            }
+            else
+                if(type->toUpper() == "DATE")
+                {
+                    QDateEdit *pDateEdit = new QDateEdit(QDate::currentDate());
+                    pDateEdit->setCalendarPopup(true);
+
+                    return pDateEdit;
+                }
+                else
+                    if(type->toUpper() == "DATETIME")
+                    {
+                        QDateTimeEdit *pDateTimeEdit = new QDateTimeEdit(QDateTime::currentDateTime());
+                        pDateTimeEdit->setCalendarPopup(true);
+
+                        return pDateTimeEdit;
+                    }
+                    else
+                    {
+                        QMessageBox::information(this, tr("Ошибка!"), tr("Тип параметра задан неверно!"));
+                        return NULL;
+                    }
+}
+
+void MainWindow::loadLayout()
+{
+    QString fileName = "DockProperties.set";
+
+    QFile file(fileName);
+    if (!file.open(QFile::ReadOnly)) {
+        QString msg = tr("Не удается открыть файл настроек %1\n%2")
+                        .arg(fileName)
+                        .arg(file.errorString());
+        QMessageBox::warning(this, tr("Ошибка"), msg);
+        return;
+    }
+
+    uchar geo_size;
+    QByteArray geo_data;
+    QByteArray layout_data;
+
+    bool ok = file.getChar((char*)&geo_size);
+    if (ok) {
+        geo_data = file.read(geo_size);
+        ok = geo_data.size() == geo_size;
+    }
+    if (ok) {
+        layout_data = file.readAll();
+        ok = layout_data.size() > 0;
+    }
+
+    if (ok)
+        ok = restoreGeometry(geo_data);
+    if (ok)
+        ok = restoreState(layout_data);
+
+    if (!ok) {
+        QString msg = tr("Ошибка чтения файла настроек %1")
+                        .arg(fileName);
+        QMessageBox::warning(this, tr("Ошибка"), msg);
+        return;
+    }
+}
+
+void MainWindow::saveLayout()
+{
+    QString fileName = "DockProperties.set";
+
+    QFile file(fileName);
+    if (!file.open(QFile::WriteOnly)) {
+        QString msg = tr("Не удается открыть файл настроек %1\n%2")
+                        .arg(fileName)
+                        .arg(file.errorString());
+        QMessageBox::warning(this, tr("Ошибка"), msg);
+        return;
+    }
+
+    QByteArray geo_data = saveGeometry();
+    QByteArray layout_data = saveState();
+
+    bool ok = file.putChar((uchar)geo_data.size());
+    if (ok)
+        ok = file.write(geo_data) == geo_data.size();
+    if (ok)
+        ok = file.write(layout_data) == layout_data.size();
+
+    if (!ok) {
+        QString msg = tr("Ошибка записи настроек в %1\n%2")
+                        .arg(fileName)
+                        .arg(file.errorString());
+        QMessageBox::warning(this, tr("Ошибка"), msg);
+        return;
+    }
+}
 
 void MainWindow::setXMLReader(XMLReader *p)
 {
     pXMLReader = p;
-    connect(pXMLReader, SIGNAL(addItem(const char*)), SLOT(addItemInToolBox(const char*)));
+    connect(pXMLReader, SIGNAL(addTab(QString)), SLOT(addTabQueries(QString)));
+    connect(pXMLReader, SIGNAL(addQueryName(QString,int,int)), SLOT(addQueryName(QString,int,int)));
+    connect(pXMLReader, SIGNAL(isTabExist(QString)), SLOT(isTabExist(QString)));
 }
 
 void MainWindow::setSQL(SQL *p)
@@ -75,41 +265,10 @@ void MainWindow::setMediaPlayer(MediaPlayer *p)
 //    pMediaPlayer->setVolumeSlider(ui->NavigationHorizontalLayout);
 }
 
-void MainWindow::setHeightToolBox(qint32 count_query)
-{
-//    HeightToolBox = count_query * 45;
-
-//    if(HeightToolBox < ui->toolBox->height())
-//    {
-//        HeightToolBox = ui->toolBox->height();
-//        return;
-//    }
-
-//    ui->toolBox->resize(ui->toolBox->width(), HeightToolBox);
-}
-
 void MainWindow::setHttpDownload(HttpDownload *p)
 {
     pHttpDownload = p;
     connect(pHttpDownload, SIGNAL(fileDownloaded(QString, QDateTime)), pMediaPlayer, SLOT(LoadVideo(QString, QDateTime)));
-}
-
-QFormLayout *MainWindow::addItemInToolBox(const char *text)
-{
-//    QFrame *pFrame = new QFrame(ui->toolBox);
-//    pFrame->setFrameShape(QFrame::Box);
-//    pFrame->setObjectName("FrameIntoToolBox");
-
-//    QFormLayout *pFormLayout = new QFormLayout(pFrame);
-//    pFormLayout->setObjectName("FormLayout");
-
-//    QWidget *newItem = ui->toolBox->widget(ui->toolBox->addItem(pFrame, tr(text)));
-//    newItem->setToolTip(QString(tr(text)));
-//    newItem->setObjectName("AddItem");
-
-//    setHeightToolBox(pXMLReader->getCountQuery());
-
-//    return pFormLayout;
 }
 
 void MainWindow::getDateTimeFromCurrentRow(QModelIndex ModelIndex)
@@ -167,7 +326,21 @@ void MainWindow::ClickedFind()
 //    }
 
 //    ui->tableView->setModel(pSQL->QueryExec());
-//    ui->tableView->show();
+    //    ui->tableView->show();
+}
+
+int MainWindow::isTabExist(QString TabName)
+{
+    for(int i = 0; i < pTWQueries->count(); i++)
+        if(pTWQueries->tabText(i) == TabName)
+            return i;
+
+    return -1;
+}
+
+void MainWindow::addQueryName(QString name, int indexTab, int numQueryInList)
+{
+    ListPointsComboBoxQuery[indexTab]->addItem(name, numQueryInList);   // Добавили в комбобокс название запроса и номер этого запроса в QueryList
 }
 
 void MainWindow::movedHorisontalSplitter(int pos, int index)
@@ -193,5 +366,10 @@ void MainWindow::resizeEvent(QResizeEvent *pe)
 
 //    qint32 x_button = (ui->frameToolBox->width() - ui->pushButton->width()) / 2;
 //    qint32 y_button = ui->scrollArea->height() + (ui->frameToolBox->height() - ui->scrollArea->height()) / 2 - ui->pushButton->height() / 2;
-//    ui->pushButton->move(x_button, y_button);
+    //    ui->pushButton->move(x_button, y_button);
+}
+
+void MainWindow::closeEvent(QCloseEvent *pe)
+{
+    saveLayout();
 }

@@ -1,14 +1,8 @@
 #include <QMessageBox>
-#include <QLabel>
-#include <QLineEdit>
-#include <QDateEdit>
-#include <QDateTimeEdit>
 
 #include <stdio.h>
 
 #include "xmlreader.h"
-#include "longintvalidator.h"
-#include "currencyvalidator.h"
 
 XMLReader::XMLReader(QObject *parent) :
     QObject(parent)
@@ -39,13 +33,13 @@ void XMLReader::ReadFile(const QString &FileName)
         {
             QDomElement domElement = domDoc.documentElement();
             traverseNode(domElement);
-            PrintQueryList();
+//            PrintQueryList();
         }
         file.close();
     }
     else
     {
-        QMessageBox::information(new QWidget(),QObject::tr("Открытие файла"), QObject::tr("Не удается открыть файл!"));
+        QMessageBox::information(new QWidget(),QObject::tr("Открытие файла"), QObject::tr("Не удалось открыть файл!"));
     }
 }
 
@@ -61,9 +55,15 @@ void XMLReader::traverseNode(const QDomNode &node)
             {
                 if(domElement.tagName() == "Query")
                 {
-                    countQuery++;
+                    // проверяем, существует ли вкладка с таким именем
+                    int index = emit isTabExist(tr(domElement.attribute("TabName", "").toUtf8().data()));
+//                    qDebug() << domElement.attribute("TabName", "").toUtf8().data();
+                    // если вкладки еще нет, создаем ее
+                    if(index == -1)
+                        index = emit addTab(tr(domElement.attribute("TabName", "").toUtf8().data()));
 
-                    pNewItemFrame = emit addItem(domElement.attribute("name", "").toUtf8().data());
+                    // добавляем название запроса в комбобокс в нужную нам категорию(index)
+                    emit addQueryName(tr(domElement.attribute("name", "").toUtf8().data()), index, countQuery);
 
                     Query newQuery;
                     newQuery.num = domElement.attribute("num", "").toInt();
@@ -73,97 +73,54 @@ void XMLReader::traverseNode(const QDomNode &node)
                     else
                         newQuery.ischild = false;
 
-
                     QueryList.push_back(newQuery);
 
-//                    qDebug() << "Query:"
-//                    << "\nname: " << domElement.attribute("name", "")
-//                    << "\nchild: " << domElement.attribute("child", "")
-//                    << "\nischild: " << domElement.attribute("ischild", "");
+                    countQuery++;
+
+                    //                    qDebug() << "Query:"
+                    //                    << "\nname: " << domElement.attribute("name", "")
+                    //                    << "\nchild: " << domElement.attribute("child", "")
+                    //                    << "\nischild: " << domElement.attribute("ischild", "");
                 }
                 else
-                    if(domElement.tagName() == "SQL")
+                    if(domElement.tagName() == "description")
                     {
-                        QueryList.back().sql = domElement.text();
-//                        qDebug() << "select: " << domElement.text();
+                        QueryList.back().description = domElement.text();
                     }
                     else
-                        if(domElement.tagName() == "parameter")
+                        if(domElement.tagName() == "SQL")
                         {
-
-                            pNewItemFrame->addRow(domElement.attribute("name", ""), createInputBox(&domElement.attribute("type", "")));
-
-                            Parameter newParameter;
-                            newParameter.value = ":" + domElement.attribute("value", "") ;
-                            newParameter.type = domElement.attribute("type", "");
-
-                            QueryList.back().ParameterList.push_back(newParameter);
-
-//                            qDebug() << "parameter: "
-//                            << "\nvalue " << domElement.attribute("value", "")
-//                            << "\nname: " << domElement.attribute("name", "")
-//                            << "\ntype: " << domElement.attribute("type", "");
+                            QueryList.back().sql = domElement.text();
+                            //                        qDebug() << "select: " << domElement.text();
                         }
                         else
-                        {
-                            //qDebug() << "TagName: " << domElement.tagName() << "\tText: " << domElement.text();
-                        }
+                            if(domElement.tagName() == "parameter")
+                            {
+
+//                                pNewItemFrame->addRow(domElement.attribute("name", ""), createInputBox(&domElement.attribute("type", "")));
+
+                                Parameter newParameter;
+                                newParameter.value = ":" + domElement.attribute("value", "") ;
+                                newParameter.name = domElement.attribute("name", "");
+                                newParameter.type = domElement.attribute("type", "");
+
+                                QueryList.back().ParameterList.push_back(newParameter);
+
+                                //                            qDebug() << "parameter: "
+                                //                            << "\nvalue " << domElement.attribute("value", "")
+                                //                            << "\nname: " << domElement.attribute("name", "")
+                                //                            << "\ntype: " << domElement.attribute("type", "");
+                            }
+                            else
+                            {
+//                                QMessageBox::information(0, tr("Ошибка!"), tr("Во время чтения файла запросов встречен неизвестный тег: %1  ").arg(domElement.tagName()));
+                            }
             }
         }
         traverseNode(domNode);
         domNode = domNode.nextSibling();
     }
 }
-
-QWidget *XMLReader::createInputBox(const QString *type)
-{
-    if(type->toUpper() == "INT")
-    {
-        LongIntValidator *pLongIntValidator = new LongIntValidator();
-
-        QLineEdit *pLineEdit = new QLineEdit();
-        pLineEdit->setValidator(pLongIntValidator);
-
-        return pLineEdit;
-    }
-    else
-        if(type->toUpper() == "CHAR")
-        {
-            QLineEdit *pLineEdit = new QLineEdit();
-
-            return pLineEdit;
-        }
-        else
-            if(type->toUpper() == "CURRENCY")
-            {
-                CurrencyValidator *pCurrencyValidator = new CurrencyValidator();
-
-                QLineEdit *pLineEdit = new QLineEdit();
-                pLineEdit->setValidator(pCurrencyValidator);
-
-                return pLineEdit;
-            }
-            else
-                if(type->toUpper() == "DATE")
-                {
-                    QDateEdit *pDateEdit = new QDateEdit(QDate::currentDate());
-                    pDateEdit->setCalendarPopup(true);
-
-                    return pDateEdit;
-                }
-                else
-                    if(type->toUpper() == "DATETIME")
-                    {
-                        QDateTimeEdit *pDateTimeEdit = new QDateTimeEdit(QDateTime::currentDateTime());
-                        pDateTimeEdit->setCalendarPopup(true);
-
-                        return pDateTimeEdit;
-                    }
-                    else
-                        return 0;
-
-}
-
 
 qint32 XMLReader::getCountQuery()
 {

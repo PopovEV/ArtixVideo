@@ -20,7 +20,8 @@ SOURCES += main.cpp\
     currencyvalidator.cpp \
     mediaplayer.cpp \
     httpdialog.cpp \
-    httpdownload.cpp
+    httpdownload.cpp \
+    dockwidget.cpp
 
 HEADERS  += mainwindow.h \
     sql.h \
@@ -29,7 +30,8 @@ HEADERS  += mainwindow.h \
     currencyvalidator.h \
     mediaplayer.h \
     httpdialog.h \
-    httpdownload.h
+    httpdownload.h \
+    dockwidget.h
 
 FORMS    += mainwindow.ui
 

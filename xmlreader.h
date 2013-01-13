@@ -4,9 +4,11 @@
 #include <QObject>
 #include <QtXml>
 #include <QFormLayout>
+#include <QFrame>
 
 struct Parameter{
     QString value;
+    QString name;
     QString type;
 };
 
@@ -14,6 +16,7 @@ struct Query{
     int num;
     int child;
     bool ischild;
+    QString description;
     QString sql;
     QList<Parameter> ParameterList;
 };
@@ -41,7 +44,9 @@ private:
     void PrintQueryList();
 
 signals:
-    QFormLayout* addItem(const char *);
+    void addQueryName(QString name, int indexTab, int numQueryInList);
+    int addTab(QString nameTab);
+    int isTabExist(QString nameTab); // если вкладка уже создана, возвращает номер вкладки, иначе -1
 
 public slots:
     
