@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
 //    w->setHttpDownload(pHttpDownload);
 
 
-    xml_reader->ReadFile("d:/POVT/NIRS/Projects/ArtixVideo/Queries.xml");
+    xml_reader->ReadFile("/home/evgeniy/workspace/kursovaya/ArtixVideo/Queries.xml");
 //    sql_db->createConnection();
     w->showMaximized();
 

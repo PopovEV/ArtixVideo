@@ -48,7 +48,7 @@ QSqlQueryModel * SQL::QueryExec()
 
 void SQL::SqlPrepare(const QString &query)
 {
-    sqlquery = QSqlQuery::QSqlQuery(db);
+    sqlquery = QSqlQuery(db);
     qDebug() << sqlquery.prepare(query);
 }
 

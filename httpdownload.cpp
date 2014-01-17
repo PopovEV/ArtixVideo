@@ -75,7 +75,8 @@ void HttpDownload::setUrl(QDateTime currentDateTime)
 
     qDebug() << pUrl->toString();
 
-    setFileName(&currentDateTime.time());
+    QTime *currentTime = new QTime(currentDateTime.time());
+    setFileName(currentTime);
 }
 
 void HttpDownload::setFileName(QTime *currentTime)
@@ -87,7 +88,7 @@ void HttpDownload::setFileName(QTime *currentTime)
     time->setHMS(currentTime->hour(), currentTime->minute(), currentTime->second());
 
     QString pathUrl = pUrl->path();
-    QUrl tempUrl = QUrl::QUrl(pUrl->toString());
+    QUrl tempUrl = QUrl(pUrl->toString());
 
     qint32 count = 0;
 
