@@ -21,7 +21,9 @@ SOURCES += main.cpp\
     mediaplayer.cpp \
     httpdialog.cpp \
     httpdownload.cpp \
-    dockwidget.cpp
+    dockwidget.cpp \
+    widgetsfactory.cpp \
+    mainwindowmemento.cpp
 
 HEADERS  += mainwindow.h \
     sql.h \
@@ -31,7 +33,9 @@ HEADERS  += mainwindow.h \
     mediaplayer.h \
     httpdialog.h \
     httpdownload.h \
-    dockwidget.h
+    dockwidget.h \
+    widgetsfactory.h \
+    mainwindowmemento.h
 
 FORMS    += mainwindow.ui
 

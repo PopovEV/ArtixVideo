@@ -4,15 +4,20 @@
 #include <QtGui>
 #include <QDebug>
 
+#include <mainwindowmemento.h>
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
-    CreateInterface();  // создаем интерфейс главного окна
-//    if(QFile::exists("DockProperties.set"))
-//        loadLayout();
+    createInterface();  // создаем интерфейс главного окна
+
+    // Восстанавливаем вид главного окна
+    MainWindowMemento *memento = createMemento();
+    setMemento(memento);
+    delete memento;
 
 //    connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(ClickedFind()));
 //    connect(ui->HorisontalSplitter, SIGNAL(splitterMoved(int,int)), this, SLOT(movedHorisontalSplitter(int,int)));
@@ -25,7 +30,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::CreateInterface()
+void MainWindow::createInterface()
 {
     // создаем интерфейс главного окна
     QMainWindow::setCorner(Qt::TopLeftCorner, Qt::TopDockWidgetArea);
@@ -41,7 +46,7 @@ void MainWindow::CreateInterface()
     QMainWindow::setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
 
     pDWEvent = new DockWidget(tr("События"), this);
-    pDWEvent->setObjectName("DWVideo");
+    pDWEvent->setObjectName("DWEvent");
     pDWEvent->setAllowedAreas(Qt::RightDockWidgetArea);
     pDWEvent->setFloating(false);
     pDWEvent->setFeatures(QDockWidget::NoDockWidgetFeatures);
@@ -50,7 +55,7 @@ void MainWindow::CreateInterface()
     QMainWindow::setCorner(Qt::TopLeftCorner, Qt::LeftDockWidgetArea);
 
     pDWQueries = new DockWidget(tr("Запросы"), this);
-    pDWQueries->setObjectName("DWVideo");
+    pDWQueries->setObjectName("DWQuery");
     pDWQueries->setAllowedAreas(Qt::LeftDockWidgetArea);
     pDWQueries->setFloating(false);
     pDWQueries->setFeatures(QDockWidget::NoDockWidgetFeatures);
@@ -59,7 +64,7 @@ void MainWindow::CreateInterface()
     QMainWindow::setCorner(Qt::BottomRightCorner, Qt::BottomDockWidgetArea);
 
     pDWResult = new DockWidget(tr("Результаты поиска"), this);
-    pDWResult->setObjectName("DWVideo");
+    pDWResult->setObjectName("DWResult");
     pDWResult->setAllowedAreas(Qt::BottomDockWidgetArea);
     pDWResult->setFloating(false);
     pDWResult->setFeatures(QDockWidget::NoDockWidgetFeatures);
@@ -84,6 +89,16 @@ void MainWindow::CreateInterface()
     pPBExecQuery->setFixedWidth(150);
     pVBL->addWidget(pPBExecQuery, 1);
     pVBL->setAlignment(pPBExecQuery, Qt::AlignHCenter);
+}
+
+void MainWindow::setMemento(MainWindowMemento *memento)
+{
+    memento->loadState();
+}
+
+MainWindowMemento *MainWindow::createMemento()
+{
+    return new MainWindowMemento(this);
 }
 
 int MainWindow::addTabQueries(QString name)
@@ -114,128 +129,6 @@ int MainWindow::addTabQueries(QString name)
     pF->setLayout(pVBL);
 
     return index;
-}
-
-QWidget *MainWindow::createInputBox(const QString *type)
-{
-    if(type->toUpper() == "INT")
-    {
-        LongIntValidator *pLongIntValidator = new LongIntValidator();
-
-        QLineEdit *pLineEdit = new QLineEdit();
-        pLineEdit->setValidator(pLongIntValidator);
-
-        return pLineEdit;
-    }
-    else
-        if(type->toUpper() == "CHAR")
-        {
-            QLineEdit *pLineEdit = new QLineEdit();
-
-            return pLineEdit;
-        }
-        else
-            if(type->toUpper() == "CURRENCY")
-            {
-                CurrencyValidator *pCurrencyValidator = new CurrencyValidator();
-
-                QLineEdit *pLineEdit = new QLineEdit();
-                pLineEdit->setValidator(pCurrencyValidator);
-
-                return pLineEdit;
-            }
-            else
-                if(type->toUpper() == "DATE")
-                {
-                    QDateEdit *pDateEdit = new QDateEdit(QDate::currentDate());
-                    pDateEdit->setCalendarPopup(true);
-
-                    return pDateEdit;
-                }
-                else
-                    if(type->toUpper() == "DATETIME")
-                    {
-                        QDateTimeEdit *pDateTimeEdit = new QDateTimeEdit(QDateTime::currentDateTime());
-                        pDateTimeEdit->setCalendarPopup(true);
-
-                        return pDateTimeEdit;
-                    }
-                    else
-                    {
-                        QMessageBox::information(this, tr("Ошибка!"), tr("Тип параметра задан неверно!"));
-                        return NULL;
-                    }
-}
-
-void MainWindow::loadLayout()
-{
-    QString fileName = "DockProperties.set";
-
-    QFile file(fileName);
-    if (!file.open(QFile::ReadOnly)) {
-        QString msg = tr("Не удается открыть файл настроек %1\n%2")
-                        .arg(fileName)
-                        .arg(file.errorString());
-        QMessageBox::warning(this, tr("Ошибка"), msg);
-        return;
-    }
-
-    uchar geo_size;
-    QByteArray geo_data;
-    QByteArray layout_data;
-
-    bool ok = file.getChar((char*)&geo_size);
-    if (ok) {
-        geo_data = file.read(geo_size);
-        ok = geo_data.size() == geo_size;
-    }
-    if (ok) {
-        layout_data = file.readAll();
-        ok = layout_data.size() > 0;
-    }
-
-    if (ok)
-        ok = restoreGeometry(geo_data);
-    if (ok)
-        ok = restoreState(layout_data);
-
-    if (!ok) {
-        QString msg = tr("Ошибка чтения файла настроек %1")
-                        .arg(fileName);
-        QMessageBox::warning(this, tr("Ошибка"), msg);
-        return;
-    }
-}
-
-void MainWindow::saveLayout()
-{
-    QString fileName = "DockProperties.set";
-
-    QFile file(fileName);
-    if (!file.open(QFile::WriteOnly)) {
-        QString msg = tr("Не удается открыть файл настроек %1\n%2")
-                        .arg(fileName)
-                        .arg(file.errorString());
-        QMessageBox::warning(this, tr("Ошибка"), msg);
-        return;
-    }
-
-    QByteArray geo_data = saveGeometry();
-    QByteArray layout_data = saveState();
-
-    bool ok = file.putChar((uchar)geo_data.size());
-    if (ok)
-        ok = file.write(geo_data) == geo_data.size();
-    if (ok)
-        ok = file.write(layout_data) == layout_data.size();
-
-    if (!ok) {
-        QString msg = tr("Ошибка записи настроек в %1\n%2")
-                        .arg(fileName)
-                        .arg(file.errorString());
-        QMessageBox::warning(this, tr("Ошибка"), msg);
-        return;
-    }
 }
 
 void MainWindow::setXMLReader(XMLReader *p)
@@ -340,7 +233,8 @@ int MainWindow::isTabExist(QString TabName)
 
 void MainWindow::addQueryName(QString name, int indexTab, int numQueryInList)
 {
-    ListPointsComboBoxQuery[indexTab]->addItem(name, numQueryInList);   // Добавили в комбобокс название запроса и номер этого запроса в QueryList
+    // Добавили в комбобокс название запроса и номер этого запроса в QueryList
+    ListPointsComboBoxQuery[indexTab]->addItem(name, numQueryInList);
 }
 
 void MainWindow::movedHorisontalSplitter(int pos, int index)
@@ -371,5 +265,7 @@ void MainWindow::resizeEvent(QResizeEvent *pe)
 
 void MainWindow::closeEvent(QCloseEvent *pe)
 {
-    saveLayout();
+    MainWindowMemento *memento = createMemento();
+    memento->saveState();
+    delete memento;
 }

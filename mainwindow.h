@@ -2,7 +2,6 @@
 #define MAINWINDOW_H
 
 #include <QtGui>
-#include <QDockWidget>
 #include <QMessageBox>
 #include <QLabel>
 #include <QLineEdit>
@@ -16,9 +15,7 @@
 #include "mediaplayer.h"
 #include "httpdownload.h"
 #include "dockwidget.h"
-#include "longintvalidator.h"
-#include "currencyvalidator.h"
-
+#include "mainwindowmemento.h"
 
 namespace Ui {
 class MainWindow;
@@ -32,10 +29,9 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-    void CreateInterface(); // создаем интерфейс главного окна
-    QWidget *createInputBox(const QString *type);   // создание бокса для ввода значений параметра в соответствии с типом
-    void loadLayout();  // восстановление сохраненных настроек приложения
-    void saveLayout();  // сохранение настроек приложения
+    void createInterface(); // создаем интерфейс главного окна
+    void setMemento(MainWindowMemento *memento);
+    MainWindowMemento * createMemento();
 
     void setXMLReader(XMLReader *p);
     void setSQL(SQL *p);
