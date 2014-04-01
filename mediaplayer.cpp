@@ -55,7 +55,7 @@ void MediaPlayer::slotLoad()
     }
 }
 
-void MediaPlayer::LoadVideo(const QString &path, const QDateTime &selectDateTime)
+void MediaPlayer::loadVideo(const QString &path, const QDateTime &selectDateTime)
 {
     if (!path.isEmpty())
     {

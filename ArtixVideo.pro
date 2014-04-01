@@ -35,9 +35,13 @@ HEADERS  += mainwindow.h \
     httpdownload.h \
     dockwidget.h \
     widgetsfactory.h \
-    mainwindowmemento.h
+    mainwindowmemento.h \
+    global.h
 
 FORMS    += mainwindow.ui
 
 OTHER_FILES += \
     Queries.xml
+
+RESOURCES += \
+    resource.qrc

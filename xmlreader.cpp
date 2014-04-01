@@ -1,19 +1,16 @@
-#include <QMessageBox>
-
-#include <stdio.h>
-
 #include "xmlreader.h"
+
+#include <QMessageBox>
 
 XMLReader::XMLReader(QObject *parent) :
     QObject(parent)
 {
-        countQuery = 0;
+    countQuery = 0;
 }
 
-void XMLReader::ReadFile(const QString &FileName)
+bool XMLReader::checkFile(const QString &fileName)
 {
-    QFile file(FileName);
-
+    QFile file(fileName);
     if(file.open(QIODevice::ReadOnly))
     {
         QString errorStr;
@@ -22,28 +19,36 @@ void XMLReader::ReadFile(const QString &FileName)
 
         if (!domDoc.setContent(&file, true, &errorStr, &errorLine, &errorColumn))
         {
-            QMessageBox::information(new QWidget(),QObject::tr("Чтение запросов"),
-                                                            QObject::tr("Синтаксическая ошибка в строке %1, столбец %2:\n%3")
-                                                            .arg(errorLine)
-                                                            .arg(errorColumn)
-                                                            .arg(errorStr));
-            return ;
-        }
-        else
-        {
-            QDomElement domElement = domDoc.documentElement();
-            traverseNode(domElement);
-//            PrintQueryList();
+            QMessageBox::information(0,
+                                     QObject::tr("Чтение запросов"),
+                                     QObject::tr("Синтаксическая ошибка в строке %1, столбец %2:\n%3")
+                                     .arg(errorLine)
+                                     .arg(errorColumn)
+                                     .arg(errorStr));
+            return false;
         }
         file.close();
+        return true;
     }
     else
     {
-        QMessageBox::information(new QWidget(),QObject::tr("Открытие файла"), QObject::tr("Не удалось открыть файл!"));
+        QMessageBox::information(new QWidget(),QObject::tr("Открытие файла"),
+                                 QObject::tr("Не удалось открыть файл!"));
     }
+    return false;
 }
 
-void XMLReader::traverseNode(const QDomNode &node)
+QList<Query> *XMLReader::getQueries()
+{
+    QList<Query> *queryList = new QList<Query>();
+    if(!domDoc.isNull()) {
+        QDomElement domElement = domDoc.documentElement();
+        traverseNode(domElement, queryList);
+    }
+    return queryList;
+}
+
+void XMLReader::traverseNode(const QDomNode &node, QList<Query> *queryList)
 {
     QDomNode domNode = node.firstChild();
     while(!domNode.isNull())
@@ -55,27 +60,18 @@ void XMLReader::traverseNode(const QDomNode &node)
             {
                 if(domElement.tagName() == "Query")
                 {
-                    // проверяем, существует ли вкладка с таким именем
-                    int index = emit isTabExist(tr(domElement.attribute("TabName", "").toUtf8().data()));
-//                    qDebug() << domElement.attribute("TabName", "").toUtf8().data();
-                    // если вкладки еще нет, создаем ее
-                    if(index == -1)
-                        index = emit addTab(tr(domElement.attribute("TabName", "").toUtf8().data()));
-
-                    // добавляем название запроса в комбобокс в нужную нам категорию(index)
-                    emit addQueryName(tr(domElement.attribute("name", "").toUtf8().data()), index, countQuery);
-
                     Query newQuery;
+                    newQuery.id = countQuery++;
                     newQuery.num = domElement.attribute("num", "").toInt();
+                    newQuery.name = domElement.attribute("name", "");
                     newQuery.child = domElement.attribute("child", "").toInt();
                     if(domElement.attribute("ischild", "").toUpper() == "TRUE")
                         newQuery.ischild = true;
                     else
                         newQuery.ischild = false;
+                    newQuery.tabName = domElement.attribute("TabName", "");
 
-                    QueryList.push_back(newQuery);
-
-                    countQuery++;
+                    queryList->push_back(newQuery);
 
                     //                    qDebug() << "Query:"
                     //                    << "\nname: " << domElement.attribute("name", "")
@@ -85,26 +81,26 @@ void XMLReader::traverseNode(const QDomNode &node)
                 else
                     if(domElement.tagName() == "description")
                     {
-                        QueryList.back().description = domElement.text();
+                        queryList->back().description = domElement.text();
                     }
                     else
                         if(domElement.tagName() == "SQL")
                         {
-                            QueryList.back().sql = domElement.text();
+                            queryList->back().sql = domElement.text();
                             //                        qDebug() << "select: " << domElement.text();
                         }
                         else
                             if(domElement.tagName() == "parameter")
                             {
 
-//                                pNewItemFrame->addRow(domElement.attribute("name", ""), createInputBox(&domElement.attribute("type", "")));
+                                //                                pNewItemFrame->addRow(domElement.attribute("name", ""), createInputBox(&domElement.attribute("type", "")));
 
                                 Parameter newParameter;
                                 newParameter.value = ":" + domElement.attribute("value", "") ;
                                 newParameter.name = domElement.attribute("name", "");
                                 newParameter.type = domElement.attribute("type", "");
 
-                                QueryList.back().ParameterList.push_back(newParameter);
+                                queryList->back().ParameterList.push_back(newParameter);
 
                                 //                            qDebug() << "parameter: "
                                 //                            << "\nvalue " << domElement.attribute("value", "")
@@ -113,37 +109,27 @@ void XMLReader::traverseNode(const QDomNode &node)
                             }
                             else
                             {
-//                                QMessageBox::information(0, tr("Ошибка!"), tr("Во время чтения файла запросов встречен неизвестный тег: %1  ").arg(domElement.tagName()));
+                                //                                QMessageBox::information(0, tr("Ошибка!"), tr("Во время чтения файла запросов встречен неизвестный тег: %1  ").arg(domElement.tagName()));
                             }
             }
         }
-        traverseNode(domNode);
+        traverseNode(domNode, queryList);
         domNode = domNode.nextSibling();
     }
 }
 
-qint32 XMLReader::getCountQuery()
+void XMLReader::printQueryList(QList<Query> *queryList)
 {
-    return countQuery;
-}
-
-Query XMLReader::getQuery(qint32 index)
-{
-    return QueryList.value(index);
-}
-
-void XMLReader::PrintQueryList()
-{
-    for(int i = 0; i < QueryList.count(); ++i)
+    for(int i = 0; i < queryList->count(); ++i)
     {
-        qDebug() << QueryList.at(i).num ;
-        qDebug() << QueryList.at(i).child ;
-        qDebug() << QueryList.at(i).ischild ;
-        qDebug() << QueryList.at(i).sql ;
-        for(int j = 0; j < QueryList.at(i).ParameterList.count(); ++j)
+        qDebug() << queryList->at(i).num ;
+        qDebug() << queryList->at(i).child ;
+        qDebug() << queryList->at(i).ischild ;
+        qDebug() << queryList->at(i).sql ;
+        for(int j = 0; j < queryList->at(i).ParameterList.count(); ++j)
         {
-            qDebug() << QueryList.at(i).ParameterList.at(j).value ;
-            qDebug() << QueryList.at(i).ParameterList.at(j).type;
+            qDebug() << queryList->at(i).ParameterList.at(j).value ;
+            qDebug() << queryList->at(i).ParameterList.at(j).type;
         }
     }
 }

@@ -39,7 +39,7 @@ signals:
 public slots:
     void slotLoad();
 
-    void LoadVideo(const QString &path, const QDateTime &selectDateTime);
+    void loadVideo(const QString &path, const QDateTime &selectDateTime);
     void seek( Phonon::State newstate, Phonon::State oldstate);
     
 };

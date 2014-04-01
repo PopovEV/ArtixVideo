@@ -16,6 +16,7 @@
 #include "httpdownload.h"
 #include "dockwidget.h"
 #include "mainwindowmemento.h"
+#include "global.h"
 
 namespace Ui {
 class MainWindow;
@@ -31,9 +32,8 @@ public:
 
     void createInterface(); // создаем интерфейс главного окна
     void setMemento(MainWindowMemento *memento);
-    MainWindowMemento * createMemento();
+    MainWindowMemento *createMemento();
 
-    void setXMLReader(XMLReader *p);
     void setSQL(SQL *p);
     void setMediaPlayer(MediaPlayer *p);
     void setHttpDownload(HttpDownload *p);
@@ -47,30 +47,34 @@ public:
     DockWidget *pDWEvent;
 
     QTabWidget *pTWQueries;
-    QPushButton *pPBExecQuery;   // кнопка выполнения выбранного запроса
+    QPushButton *pPBExecQuery;      // кнопка выполнения выбранного запроса
+    QFormLayout *pFLCurrentInputWidgets;     // dlya razmesheniya widgetov neobhodimih dlya zaprosa
 
 
 private:
-    XMLReader *pXMLReader;
     SQL *pSQL;
     MediaPlayer *pMediaPlayer;
     HttpDownload *pHttpDownload;
 
-    QList <QComboBox *> ListPointsComboBoxQuery;        // указатели на комбобоксы, соответствующие каждой вкладке
-    QList <QTextEdit *> ListPointsDescription;          // указатели на текстовые поля для описания запроса для каждой вкладке
-    QList <QGroupBox *> ListPointsGroupBoxQuery;        // указатели на бокс группировки параметров запросов
+    QList <QComboBox *> listPointsComboBoxQuery;        // указатели на комбобоксы, соответствующие каждой вкладке
+    QList <QTextEdit *> listPointsDescription;          // указатели на текстовые поля для описания запроса для каждой вкладке
+    QList <QGroupBox *> listPointsGroupBoxQuery;        // указатели на бокс группировки параметров запросов
 
+    QList<Query> *queryList;
 
 signals:
 
 
 public slots:
-    void ClickedFind();
-    int isTabExist(QString TabName);    // существует ли уже такая вкладка?   -1 - не существует
+    void clickedFind();
+    int isTabExist(QString tabName);    // существует ли уже такая вкладка?   -1 - не существует
     int addTabQueries(QString TabName);        // добавление вкладки в TabWidget с названием категории запроса
     void addQueryName(QString name, int indexTab, int numQueryInList);  // добавление названия запроса в ComboBox нужной вкладки
     void movedHorisontalSplitter(int pos, int index);
     void getDateTimeFromCurrentRow(QModelIndex ModelIndex);
+
+    void loadQueries();
+    void createQueryInterface();
 
 protected:
     virtual void resizeEvent(QResizeEvent *pe);

@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/queries">
+        <file>Queries.xml</file>
+    </qresource>
+</RCC>

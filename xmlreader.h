@@ -3,23 +3,8 @@
 
 #include <QObject>
 #include <QtXml>
-#include <QFormLayout>
-#include <QFrame>
 
-struct Parameter{
-    QString value;
-    QString name;
-    QString type;
-};
-
-struct Query{
-    int num;
-    int child;
-    bool ischild;
-    QString description;
-    QString sql;
-    QList<Parameter> ParameterList;
-};
+#include "global.h"
 
 class XMLReader : public QObject
 {
@@ -27,26 +12,17 @@ class XMLReader : public QObject
 public:
     explicit XMLReader(QObject *parent = 0);
 
-    void ReadFile(const QString& FileName);
-    void traverseNode(const QDomNode& node);
-    QWidget * createInputBox(const QString *type);
-    qint32 getCountQuery();
-
-    Query getQuery(qint32 index);
+    bool checkFile(const QString& fileName);
+    QList<Query> *getQueries();
+    void traverseNode(const QDomNode& node, QList<Query> *queryList);
 
 private:
     QDomDocument domDoc;
-    qint32 countQuery;
-    QFormLayout *pNewItemFrame;
+    int countQuery;
 
-    QList<Query> QueryList;
-
-    void PrintQueryList();
+    void printQueryList(QList<Query> *queryList);
 
 signals:
-    void addQueryName(QString name, int indexTab, int numQueryInList);
-    int addTab(QString nameTab);
-    int isTabExist(QString nameTab); // если вкладка уже создана, возвращает номер вкладки, иначе -1
 
 public slots:
     

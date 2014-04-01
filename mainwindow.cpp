@@ -19,10 +19,13 @@ MainWindow::MainWindow(QWidget *parent) :
     setMemento(memento);
     delete memento;
 
-//    connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(ClickedFind()));
-//    connect(ui->HorisontalSplitter, SIGNAL(splitterMoved(int,int)), this, SLOT(movedHorisontalSplitter(int,int)));
+    //    connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(ClickedFind()));
+    //    connect(ui->HorisontalSplitter, SIGNAL(splitterMoved(int,int)), this, SLOT(movedHorisontalSplitter(int,int)));
 
-//    ui->tableView->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
+    //    ui->tableView->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
+
+    loadQueries();
+    createQueryInterface();
 }
 
 MainWindow::~MainWindow()
@@ -41,7 +44,7 @@ void MainWindow::createInterface()
     pDWVideo->setFloating(false);
     pDWVideo->setFeatures(QDockWidget::NoDockWidgetFeatures);
     setCentralWidget(pDWVideo);
-//    addDockWidget(Qt::TopDockWidgetArea, );
+    //    addDockWidget(Qt::TopDockWidgetArea, );
 
     QMainWindow::setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
 
@@ -114,9 +117,9 @@ int MainWindow::addTabQueries(QString name)
     pCB->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLength);
 
     // помещаем указатели в лист для дальнейшего использования
-    ListPointsComboBoxQuery.push_back(pCB);
-    ListPointsDescription.push_back(pTE);
-    ListPointsGroupBoxQuery.push_back(pGB);
+    listPointsComboBoxQuery.push_back(pCB);
+    listPointsDescription.push_back(pTE);
+    listPointsGroupBoxQuery.push_back(pGB);
 
     // добавляем вкладку
     int index;
@@ -131,14 +134,6 @@ int MainWindow::addTabQueries(QString name)
     return index;
 }
 
-void MainWindow::setXMLReader(XMLReader *p)
-{
-    pXMLReader = p;
-    connect(pXMLReader, SIGNAL(addTab(QString)), SLOT(addTabQueries(QString)));
-    connect(pXMLReader, SIGNAL(addQueryName(QString,int,int)), SLOT(addQueryName(QString,int,int)));
-    connect(pXMLReader, SIGNAL(isTabExist(QString)), SLOT(isTabExist(QString)));
-}
-
 void MainWindow::setSQL(SQL *p)
 {
     pSQL = p;
@@ -147,85 +142,106 @@ void MainWindow::setSQL(SQL *p)
 void MainWindow::setMediaPlayer(MediaPlayer *p)
 {
     pMediaPlayer = p;
-//    connect(ui->PlayButton, SIGNAL(clicked()), pMediaPlayer->getMediaObject(), SLOT(play()));
-//    connect(ui->PauseButton, SIGNAL(clicked()), pMediaPlayer->getMediaObject(), SLOT(pause()));
-//    connect(ui->LoadButton, SIGNAL(clicked()), pMediaPlayer, SLOT(slotLoad()));
-//    connect(ui->tableView, SIGNAL(doubleClicked(QModelIndex)), pMediaPlayer->getMediaObject(), SLOT(stop()));
-//    connect(ui->tableView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(getDateTimeFromCurrentRow(QModelIndex)));
+    //    connect(ui->PlayButton, SIGNAL(clicked()), pMediaPlayer->getMediaObject(), SLOT(play()));
+    //    connect(ui->PauseButton, SIGNAL(clicked()), pMediaPlayer->getMediaObject(), SLOT(pause()));
+    //    connect(ui->LoadButton, SIGNAL(clicked()), pMediaPlayer, SLOT(slotLoad()));
+    //    connect(ui->tableView, SIGNAL(doubleClicked(QModelIndex)), pMediaPlayer->getMediaObject(), SLOT(stop()));
+    //    connect(ui->tableView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(getDateTimeFromCurrentRow(QModelIndex)));
 
-//    pMediaPlayer->setParentForVideoWidget(ui->VideoFrame1);
-//    pMediaPlayer->setSeekSlider(ui->NavigationHorizontalLayout);
-//    pMediaPlayer->setVolumeSlider(ui->NavigationHorizontalLayout);
+    //    pMediaPlayer->setParentForVideoWidget(ui->VideoFrame1);
+    //    pMediaPlayer->setSeekSlider(ui->NavigationHorizontalLayout);
+    //    pMediaPlayer->setVolumeSlider(ui->NavigationHorizontalLayout);
 }
 
 void MainWindow::setHttpDownload(HttpDownload *p)
 {
     pHttpDownload = p;
-    connect(pHttpDownload, SIGNAL(fileDownloaded(QString, QDateTime)), pMediaPlayer, SLOT(LoadVideo(QString, QDateTime)));
+    connect(pHttpDownload, SIGNAL(fileDownloaded(QString, QDateTime)), pMediaPlayer, SLOT(loadVideo(QString, QDateTime)));
 }
 
 void MainWindow::getDateTimeFromCurrentRow(QModelIndex ModelIndex)
 {
-//    int currentRow = ModelIndex.row();
+    //    int currentRow = ModelIndex.row();
 
-//    QSqlQueryModel *pSqlModel = pSQL->getSqlModel();
-//    qint32 columnCount = pSqlModel->columnCount();
+    //    QSqlQueryModel *pSqlModel = pSQL->getSqlModel();
+    //    qint32 columnCount = pSqlModel->columnCount();
 
-//    for(int i = 0; i < columnCount; ++i)
-//    {
-//        QString headerData =  pSqlModel->headerData(i, Qt::Horizontal).toString().toUpper();
-//        if(headerData == tr("ВРЕМЯ"))
-//        {
-//            QModelIndex newModelIndex = pSqlModel->index(currentRow, i, QModelIndex());
+    //    for(int i = 0; i < columnCount; ++i)
+    //    {
+    //        QString headerData =  pSqlModel->headerData(i, Qt::Horizontal).toString().toUpper();
+    //        if(headerData == tr("ВРЕМЯ"))
+    //        {
+    //            QModelIndex newModelIndex = pSqlModel->index(currentRow, i, QModelIndex());
 
-//            pHttpDownload->setUrl((pSqlModel->data(newModelIndex, Qt::DisplayRole).toDateTime()));
-//            return;
-//        }
-//    }
+    //            pHttpDownload->setUrl((pSqlModel->data(newModelIndex, Qt::DisplayRole).toDateTime()));
+    //            return;
+    //        }
+    //    }
 }
 
-void MainWindow::ClickedFind()
+void MainWindow::loadQueries()
 {
-//    int index = ui->toolBox->currentIndex();
+    XMLReader *pXMLReader = new XMLReader();
+    if (pXMLReader->checkFile(":/queries/Queries.xml")) {
+        queryList = pXMLReader->getQueries();
+    }
+    delete pXMLReader;
+}
 
-//    Query currentQuery = pXMLReader->getQuery(index);
+void MainWindow::createQueryInterface()
+{
+    for (int i = 0; i < queryList->count(); ++i) {
+        const Query &query = queryList->at(i);
+        QString tabName = query.tabName;
+        int tabIndex = isTabExist(tabName);
+        if(tabIndex == -1)
+            tabIndex = addTabQueries(tabName);
+        addQueryName(query.name, tabIndex, query.id);
+    }
+}
 
-//    pSQL->SqlPrepare(currentQuery.sql);
+void MainWindow::clickedFind()
+{
+    //    int index = ui->toolBox->currentIndex();
 
-//    QFormLayout *pFormLayout = dynamic_cast<QFormLayout *> (ui->toolBox->currentWidget()->children().first());
+    //    Query currentQuery = pXMLReader->getQuery(index);
 
-//    for(int i = 0; i < currentQuery.ParameterList.size(); ++i)
-//    {
-//        QLayoutItem *pLayoutItem = dynamic_cast<QLayoutItem *> (pFormLayout->itemAt(i, QFormLayout::FieldRole));
+    //    pSQL->SqlPrepare(currentQuery.sql);
 
-//        QString str;
+    //    QFormLayout *pFormLayout = dynamic_cast<QFormLayout *> (ui->toolBox->currentWidget()->children().first());
 
-//        if(QDateEdit *pDateEdit = dynamic_cast<QDateEdit *> (pLayoutItem->widget()))
-//        {
-//            str = pDateEdit->date().toString("yyyy-MM-dd");
-//        }
-//        else
-//            if(QDateTimeEdit *pDateTimeEdit = dynamic_cast<QDateTimeEdit *> (pLayoutItem->widget()))
-//            {
-//                str = pDateTimeEdit->dateTime().toString("yyyy-MM-dd hh:mm:ss");
-//            }
-//            else
-//                if(QLineEdit *pLineEdit = dynamic_cast<QLineEdit *> (pLayoutItem->widget()))
-//                {
-//                    str = pLineEdit->text();
-//                }
-//        qDebug() << currentQuery.ParameterList.at(i).value;
-//        pSQL->setQueryValue(currentQuery.ParameterList.at(i).value, str);
-//    }
+    //    for(int i = 0; i < currentQuery.ParameterList.size(); ++i)
+    //    {
+    //        QLayoutItem *pLayoutItem = dynamic_cast<QLayoutItem *> (pFormLayout->itemAt(i, QFormLayout::FieldRole));
 
-//    ui->tableView->setModel(pSQL->QueryExec());
+    //        QString str;
+
+    //        if(QDateEdit *pDateEdit = dynamic_cast<QDateEdit *> (pLayoutItem->widget()))
+    //        {
+    //            str = pDateEdit->date().toString("yyyy-MM-dd");
+    //        }
+    //        else
+    //            if(QDateTimeEdit *pDateTimeEdit = dynamic_cast<QDateTimeEdit *> (pLayoutItem->widget()))
+    //            {
+    //                str = pDateTimeEdit->dateTime().toString("yyyy-MM-dd hh:mm:ss");
+    //            }
+    //            else
+    //                if(QLineEdit *pLineEdit = dynamic_cast<QLineEdit *> (pLayoutItem->widget()))
+    //                {
+    //                    str = pLineEdit->text();
+    //                }
+    //        qDebug() << currentQuery.ParameterList.at(i).value;
+    //        pSQL->setQueryValue(currentQuery.ParameterList.at(i).value, str);
+    //    }
+
+    //    ui->tableView->setModel(pSQL->QueryExec());
     //    ui->tableView->show();
 }
 
-int MainWindow::isTabExist(QString TabName)
+int MainWindow::isTabExist(QString tabName)
 {
     for(int i = 0; i < pTWQueries->count(); i++)
-        if(pTWQueries->tabText(i) == TabName)
+        if(pTWQueries->tabText(i) == tabName)
             return i;
 
     return -1;
@@ -234,32 +250,32 @@ int MainWindow::isTabExist(QString TabName)
 void MainWindow::addQueryName(QString name, int indexTab, int numQueryInList)
 {
     // Добавили в комбобокс название запроса и номер этого запроса в QueryList
-    ListPointsComboBoxQuery[indexTab]->addItem(name, numQueryInList);
+    listPointsComboBoxQuery[indexTab]->addItem(name, numQueryInList);
 }
 
 void MainWindow::movedHorisontalSplitter(int pos, int index)
 {
 
-//    ui->scrollArea->resize(pos, ui->scrollArea->height());
-//    ui->toolBox->resize(pos - 20, ui->toolBox->height());
-//    ui->pushButton->move(pos / 2 - ui->pushButton->width() / 2, ui->pushButton->y());
+    //    ui->scrollArea->resize(pos, ui->scrollArea->height());
+    //    ui->toolBox->resize(pos - 20, ui->toolBox->height());
+    //    ui->pushButton->move(pos / 2 - ui->pushButton->width() / 2, ui->pushButton->y());
 
 }
 
 void MainWindow::resizeEvent(QResizeEvent *pe)
 {
-//    ui->VerticalSplitter->resize(pe->size().width(), pe->size().height() - menuBar()->height() - statusBar()->height());
-//    ui->HorisontalSplitter->resize(pe->size().width(), pe->size().height() * 2/3);
+    //    ui->VerticalSplitter->resize(pe->size().width(), pe->size().height() - menuBar()->height() - statusBar()->height());
+    //    ui->HorisontalSplitter->resize(pe->size().width(), pe->size().height() * 2/3);
 
-//    QList<int> sizes_widgets;
-//    sizes_widgets << this->height() * 2 / 3 << this->height() * 1 / 3;
-//    ui->VerticalSplitter->setSizes(sizes_widgets);
+    //    QList<int> sizes_widgets;
+    //    sizes_widgets << this->height() * 2 / 3 << this->height() * 1 / 3;
+    //    ui->VerticalSplitter->setSizes(sizes_widgets);
 
-//    ui->scrollArea->resize(ui->frameToolBox->width(), ui->frameToolBox->height() - 50);
-//    ui->toolBox->resize(ui->scrollArea->width() - 20, HeightToolBox);
+    //    ui->scrollArea->resize(ui->frameToolBox->width(), ui->frameToolBox->height() - 50);
+    //    ui->toolBox->resize(ui->scrollArea->width() - 20, HeightToolBox);
 
-//    qint32 x_button = (ui->frameToolBox->width() - ui->pushButton->width()) / 2;
-//    qint32 y_button = ui->scrollArea->height() + (ui->frameToolBox->height() - ui->scrollArea->height()) / 2 - ui->pushButton->height() / 2;
+    //    qint32 x_button = (ui->frameToolBox->width() - ui->pushButton->width()) / 2;
+    //    qint32 y_button = ui->scrollArea->height() + (ui->frameToolBox->height() - ui->scrollArea->height()) / 2 - ui->pushButton->height() / 2;
     //    ui->pushButton->move(x_button, y_button);
 }
 
