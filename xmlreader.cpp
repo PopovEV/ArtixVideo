@@ -81,12 +81,12 @@ void XMLReader::traverseNode(const QDomNode &node, QList<Query> *queryList)
                 else
                     if(domElement.tagName() == "description")
                     {
-                        queryList->back().description = domElement.text();
+                        queryList->back().description = domElement.text().simplified();
                     }
                     else
                         if(domElement.tagName() == "SQL")
                         {
-                            queryList->back().sql = domElement.text();
+                            queryList->back().sql = domElement.text().simplified();
                             //                        qDebug() << "select: " << domElement.text();
                         }
                         else

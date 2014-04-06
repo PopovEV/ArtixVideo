@@ -2,4 +2,8 @@
     <qresource prefix="/queries">
         <file>Queries.xml</file>
     </qresource>
+    <qresource prefix="/icon">
+        <file>icon/play.png</file>
+        <file>icon/pause.png</file>
+    </qresource>
 </RCC>

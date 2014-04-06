@@ -1,6 +1,6 @@
 #include "dockwidget.h"
 
-DockWidget::DockWidget(const QString &title, QWidget *parent, Qt::WFlags flags) :
+DockWidget::DockWidget(QWidget *parent, const QString &title, Qt::WFlags flags) :
     QDockWidget(parent)
 {
     setWindowTitle(title);

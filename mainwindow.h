@@ -16,6 +16,7 @@
 #include "httpdownload.h"
 #include "dockwidget.h"
 #include "mainwindowmemento.h"
+#include "widgetsfactory.h"
 #include "global.h"
 
 namespace Ui {
@@ -48,20 +49,24 @@ public:
 
     QTabWidget *pTWQueries;
     QPushButton *pPBExecQuery;      // кнопка выполнения выбранного запроса
-    QFormLayout *pFLCurrentInputWidgets;     // dlya razmesheniya widgetov neobhodimih dlya zaprosa
-
 
 private:
     SQL *pSQL;
     MediaPlayer *pMediaPlayer;
-    HttpDownload *pHttpDownload;
+    HttpDownload *httpDownload;
 
-    QList <QComboBox *> listPointsComboBoxQuery;        // указатели на комбобоксы, соответствующие каждой вкладке
-    QList <QTextEdit *> listPointsDescription;          // указатели на текстовые поля для описания запроса для каждой вкладке
-    QList <QGroupBox *> listPointsGroupBoxQuery;        // указатели на бокс группировки параметров запросов
+    QList<QComboBox *> comboBoxQueryList;        // указатели на комбобоксы, соответствующие каждой вкладке
+    QList<QTextEdit *> descriptionList;          // указатели на текстовые поля для описания запроса для каждой вкладке
+    QList<QGroupBox *> groupBoxQueryList;        // указатели на бокс группировки параметров запросов
+    QList<QFormLayout *> formLayoutQueryList;
 
     QList<Query> *queryList;
 
+    void clean(QLayout &oL);
+    void downloadFile(QDateTime &selectedTime);
+    bool downloadIndexFile(QDateTime &selectedTime);
+    QStringList getVideoFileNames(QString indexFileName);
+    QString searchSuitableFileName(const QStringList &videoFileNames, QDateTime *selectedDateTime);
 signals:
 
 
@@ -75,6 +80,9 @@ public slots:
 
     void loadQueries();
     void createQueryInterface();
+
+    void activateQuery(int index);
+    void tabChanged(int tabIndex);
 
 protected:
     virtual void resizeEvent(QResizeEvent *pe);

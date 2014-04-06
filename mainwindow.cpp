@@ -3,8 +3,7 @@
 
 #include <QtGui>
 #include <QDebug>
-
-#include <mainwindowmemento.h>
+#include <QEventLoop>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -12,20 +11,31 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    pDWQueries = ui->DWQuery;
+    pDWVideo = ui->DWVideo;
+    pDWResult = ui->DWResult;
+    pDWEvent = ui->DWEvent;
+
+    pTWQueries = ui->tabWidget;
+    pPBExecQuery = ui->pushButton_Find;      // кнопка выполнения выбранного запроса
+
     createInterface();  // создаем интерфейс главного окна
 
-    // Восстанавливаем вид главного окна
-    MainWindowMemento *memento = createMemento();
-    setMemento(memento);
-    delete memento;
+    connect(pTWQueries, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
+    connect(ui->pushButton_Find, SIGNAL(clicked()), this, SLOT(clickedFind()));
+    connect(ui->tableView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(getDateTimeFromCurrentRow(QModelIndex)));
 
-    //    connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(ClickedFind()));
     //    connect(ui->HorisontalSplitter, SIGNAL(splitterMoved(int,int)), this, SLOT(movedHorisontalSplitter(int,int)));
 
     //    ui->tableView->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
 
     loadQueries();
     createQueryInterface();
+
+    // Восстанавливаем вид главного окна
+    MainWindowMemento *memento = createMemento();
+    setMemento(memento);
+    delete memento;
 }
 
 MainWindow::~MainWindow()
@@ -35,63 +45,8 @@ MainWindow::~MainWindow()
 
 void MainWindow::createInterface()
 {
-    // создаем интерфейс главного окна
-    QMainWindow::setCorner(Qt::TopLeftCorner, Qt::TopDockWidgetArea);
-
-    pDWVideo = new DockWidget(tr("Видео"), this);
-    pDWVideo->setObjectName("DWVideo");
-    pDWVideo->setAllowedAreas(Qt::TopDockWidgetArea);
-    pDWVideo->setFloating(false);
-    pDWVideo->setFeatures(QDockWidget::NoDockWidgetFeatures);
-    setCentralWidget(pDWVideo);
-    //    addDockWidget(Qt::TopDockWidgetArea, );
-
-    QMainWindow::setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
-
-    pDWEvent = new DockWidget(tr("События"), this);
-    pDWEvent->setObjectName("DWEvent");
-    pDWEvent->setAllowedAreas(Qt::RightDockWidgetArea);
-    pDWEvent->setFloating(false);
-    pDWEvent->setFeatures(QDockWidget::NoDockWidgetFeatures);
-    addDockWidget(Qt::RightDockWidgetArea, pDWEvent);
-
-    QMainWindow::setCorner(Qt::TopLeftCorner, Qt::LeftDockWidgetArea);
-
-    pDWQueries = new DockWidget(tr("Запросы"), this);
-    pDWQueries->setObjectName("DWQuery");
-    pDWQueries->setAllowedAreas(Qt::LeftDockWidgetArea);
-    pDWQueries->setFloating(false);
-    pDWQueries->setFeatures(QDockWidget::NoDockWidgetFeatures);
-    addDockWidget(Qt::LeftDockWidgetArea, pDWQueries);
-
-    QMainWindow::setCorner(Qt::BottomRightCorner, Qt::BottomDockWidgetArea);
-
-    pDWResult = new DockWidget(tr("Результаты поиска"), this);
-    pDWResult->setObjectName("DWResult");
-    pDWResult->setAllowedAreas(Qt::BottomDockWidgetArea);
-    pDWResult->setFloating(false);
-    pDWResult->setFeatures(QDockWidget::NoDockWidgetFeatures);
-    addDockWidget(Qt::BottomDockWidgetArea, pDWResult);
-
-    /*
-     *Создаем TabWidget для группировки запросов по тематике
-    */
-    pTWQueries = new QTabWidget();
-    pTWQueries->setTabPosition(QTabWidget::West);
-
-    QVBoxLayout *pVBL = new QVBoxLayout();
-    pVBL->addWidget(pTWQueries);
-
-    QFrame *pFrame = new QFrame();
-    pDWQueries->setWidget(pFrame);
-
-    pFrame->setLayout(pVBL);
-
-    // Кнопка выполнения запроса
-    pPBExecQuery = new QPushButton(tr("Выполнить запрос"));
-    pPBExecQuery->setFixedWidth(150);
-    pVBL->addWidget(pPBExecQuery, 1);
-    pVBL->setAlignment(pPBExecQuery, Qt::AlignHCenter);
+    ui->tabWidget->clear();
+    ui->volumeSlider->setOrientation(Qt::Horizontal);
 }
 
 void MainWindow::setMemento(MainWindowMemento *memento)
@@ -109,17 +64,37 @@ int MainWindow::addTabQueries(QString name)
     QFrame *pF = new QFrame();
     QVBoxLayout *pVBL = new QVBoxLayout();
     QComboBox *pCB = new QComboBox();
-    QTextEdit *pTE = new QTextEdit();
-    QGroupBox *pGB = new QGroupBox(tr("Параметры"));
-
-    pTE->setDisabled(true);
-    // не позволяем длинным строкам расширять виджет(в середине длинной строки вставляется троеточие)
     pCB->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLength);
+    QTextEdit *pTE = new QTextEdit();
+    pTE->setReadOnly(true);
+    QGroupBox *pGB = new QGroupBox(tr("Параметры"));
+    QScrollArea *pScrollArea = new QScrollArea();
+    pScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    pScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    pScrollArea->setWidgetResizable(true);
+    pScrollArea->setFrameShape(QFrame::NoFrame);
+
+
+    QVBoxLayout *pVerticalLayout = new QVBoxLayout();
+    pGB->setLayout(pVerticalLayout);
+    pVerticalLayout->addWidget(pScrollArea);
+    pVerticalLayout->setContentsMargins(3, 3, 3, 3);
+
+    QFormLayout *pFL = new QFormLayout();
+    pFL->setRowWrapPolicy(QFormLayout::WrapLongRows);
+    pFL->setContentsMargins(3, 3, 3, 3);
+
+    QWidget *scrollWidget = new QWidget();
+    scrollWidget->setLayout(pFL);
+    pScrollArea->setWidget(scrollWidget);
+
+    connect(pCB, SIGNAL(activated(int)), this, SLOT(activateQuery(int)));
 
     // помещаем указатели в лист для дальнейшего использования
-    listPointsComboBoxQuery.push_back(pCB);
-    listPointsDescription.push_back(pTE);
-    listPointsGroupBoxQuery.push_back(pGB);
+    comboBoxQueryList.push_back(pCB);
+    descriptionList.push_back(pTE);
+    groupBoxQueryList.push_back(pGB);
+    formLayoutQueryList.push_back(pFL);
 
     // добавляем вкладку
     int index;
@@ -129,6 +104,7 @@ int MainWindow::addTabQueries(QString name)
     pVBL->addWidget(pCB, 1);
     pVBL->addWidget(pTE, 1);
     pVBL->addWidget(pGB, 3);
+    pVBL->setContentsMargins(5, 5, 5, 5);
     pF->setLayout(pVBL);
 
     return index;
@@ -155,28 +131,30 @@ void MainWindow::setMediaPlayer(MediaPlayer *p)
 
 void MainWindow::setHttpDownload(HttpDownload *p)
 {
-    pHttpDownload = p;
-    connect(pHttpDownload, SIGNAL(fileDownloaded(QString, QDateTime)), pMediaPlayer, SLOT(loadVideo(QString, QDateTime)));
+    httpDownload = p;
+    //    connect(pHttpDownload, SIGNAL(fileDownloaded(QString)), pMediaPlayer, SLOT(loadVideo(QString)));
 }
 
 void MainWindow::getDateTimeFromCurrentRow(QModelIndex ModelIndex)
 {
-    //    int currentRow = ModelIndex.row();
+    int currentRow = ModelIndex.row();
 
-    //    QSqlQueryModel *pSqlModel = pSQL->getSqlModel();
-    //    qint32 columnCount = pSqlModel->columnCount();
+    QSqlQueryModel *pSqlModel = pSQL->getSqlModel();
+    qint32 columnCount = pSqlModel->columnCount();
 
-    //    for(int i = 0; i < columnCount; ++i)
-    //    {
-    //        QString headerData =  pSqlModel->headerData(i, Qt::Horizontal).toString().toUpper();
-    //        if(headerData == tr("ВРЕМЯ"))
-    //        {
-    //            QModelIndex newModelIndex = pSqlModel->index(currentRow, i, QModelIndex());
+    for(int i = 0; i < columnCount; ++i)
+    {
+        QString headerData =  pSqlModel->headerData(i, Qt::Horizontal).toString().toUpper();
+        if(headerData == tr("ВРЕМЯ"))
+        {
+            QModelIndex newModelIndex = pSqlModel->index(currentRow, i, QModelIndex());
+            QDateTime selectedTime = pSqlModel->data(newModelIndex, Qt::DisplayRole).toDateTime();
+            downloadFile(selectedTime);
+            return;
+        }
+    }
 
-    //            pHttpDownload->setUrl((pSqlModel->data(newModelIndex, Qt::DisplayRole).toDateTime()));
-    //            return;
-    //        }
-    //    }
+    QMessageBox::information(this, "Error", "Don't find field \"Time\" in sql  model!");
 }
 
 void MainWindow::loadQueries()
@@ -200,41 +178,210 @@ void MainWindow::createQueryInterface()
     }
 }
 
+void MainWindow::clean( QLayout &oL )
+{
+    QLayoutItem *poLI;
+    QLayout *poL;
+    QWidget *poW;
+
+    if (oL.count() == 0)
+        return;
+
+    while( (poLI = oL.takeAt( 0 )) )
+    {
+        if( (poL = poLI->layout()) )
+        {
+            clean( *poL );
+            delete poL;
+        }
+        else
+            if( (poW = poLI->widget()) )
+            {
+                delete poW;
+            }
+        if (oL.count() == 0)
+            return;
+    }
+}
+
+void MainWindow::downloadFile(QDateTime &selectedTime)
+{
+    if (!downloadIndexFile(selectedTime)) {
+        return;
+    }
+
+    QString indexFileName = httpDownload->getLastFileName();
+    QStringList videoFileNames = getVideoFileNames(indexFileName);
+    if(videoFileNames.isEmpty()) {
+        QMessageBox::information(this, "Information", "There are no videos for the selected day.");
+        return;
+    }
+
+    QString fileName = searchSuitableFileName(videoFileNames, &selectedTime);
+    if(fileName.isEmpty()) {
+       return;
+    }
+
+    //Download suitable file
+    QString date;
+    date = selectedTime.date().toString("yyyyMMdd");
+
+    QUrl videoFile("http://localhost/artixvideo/" + date + "/" + fileName);
+    QEventLoop eventLoop;
+    connect(httpDownload, SIGNAL(fileDownloaded()), &eventLoop, SLOT(quit()));
+    httpDownload->doDownload(videoFile);
+    eventLoop.exec();
+
+    QString videoFileName = httpDownload->getLastFileName();
+    if(videoFileName.isNull()) {
+        return;
+    }
+
+    qDebug() << "Play video " << videoFile.toString();
+}
+
+bool MainWindow::downloadIndexFile(QDateTime &selectedTime)
+{
+    QString date;
+    date = selectedTime.date().toString("yyyyMMdd");
+
+    QUrl indexFileUrl("http://localhost/artixvideo/" + date + "/");
+    QEventLoop eventLoop;
+    connect(httpDownload, SIGNAL(fileDownloaded()), &eventLoop, SLOT(quit()));
+    httpDownload->doDownload(indexFileUrl);
+    eventLoop.exec();
+
+    QString indexFileName = httpDownload->getLastFileName();
+    if(indexFileName.isEmpty()) {
+        qDebug() << "Error download index file: " << indexFileUrl.toString();
+        return false;
+    }
+
+    return true;
+}
+
+QStringList MainWindow::getVideoFileNames(QString indexFileName)
+{
+    QStringList fileNamesList;
+    QFile indexFile(indexFileName);
+    if(!indexFile.open(QFile::ReadOnly)) {
+        qDebug() << "Error opening index file!";
+        return fileNamesList;
+    }
+
+    QString data(indexFile.readAll());
+    QRegExp regExpr("\\d*-INJ.flv", Qt::CaseInsensitive);
+    int pos = 0;
+    while ((pos = regExpr.indexIn(data, pos)) != -1) {
+        if(!fileNamesList.isEmpty()) {
+            if(fileNamesList.last() != regExpr.cap(0)) {
+                fileNamesList.push_back(regExpr.cap(0));
+            }
+        } else {
+            fileNamesList.push_back(regExpr.cap(0));
+        }
+        pos += regExpr.matchedLength();
+    }
+
+    return fileNamesList;
+}
+
+QString MainWindow::searchSuitableFileName(const QStringList &videoFileNames, QDateTime *selectedDateTime)
+{
+    QList<QTime> timeStartVideo;
+    QRegExp regExpr("\\d{6,6}");
+    foreach (QString fileName, videoFileNames) {
+        if (regExpr.indexIn(fileName) != -1) {
+            QString timeStr = regExpr.cap(0);
+            QTime time = QTime::fromString(timeStr, "hhmmss");
+            if (time.isValid()) {
+                timeStartVideo.push_back(time);
+            } else {
+                qDebug() << "Time is not valid " << timeStr;
+            }
+        }
+    }
+
+    QTime selectedTime = selectedDateTime->time();
+    QTime suitableTime;
+    foreach (QTime time, timeStartVideo) {
+        //TODO: Replace 300 sec by get option "VideoLenght" from config.ini
+        if(selectedTime >= time && selectedTime < time.addSecs(300)) {
+            suitableTime = time;
+        }
+    }
+
+    if(suitableTime.isNull()) {
+        QMessageBox::information(this, "Поиск видеофайла",
+                                 "Не удается найти подходящий по времени видеофрагмент.");
+        return QString();
+    }
+
+    return suitableTime.toString("hhmmss") + "-INJ.flv";
+}
+
+void MainWindow::activateQuery(int index)
+{
+    int currentTabIndex = pTWQueries->currentIndex();
+    QComboBox *comboBox = comboBoxQueryList[currentTabIndex];
+    int queryIndex = comboBox->itemData(index, Qt::UserRole).toInt();
+
+    //Create widgets for input sql parameters
+    QFormLayout *formLayout = formLayoutQueryList[currentTabIndex];
+    clean(*formLayout);
+
+    const Query &selectedQuery = queryList->at(queryIndex);
+    descriptionList.at(currentTabIndex)->setText(selectedQuery.description);
+
+    foreach (Parameter param, selectedQuery.ParameterList) {
+        formLayout->addRow(param.name,
+                           WidgetsFactory::getInstance()->getWidget(param.type));
+    }
+}
+
+void MainWindow::tabChanged(int tabIndex)
+{
+    int currentComboBoxIndex = comboBoxQueryList[tabIndex]->currentIndex();
+    activateQuery(currentComboBoxIndex);
+}
+
 void MainWindow::clickedFind()
 {
-    //    int index = ui->toolBox->currentIndex();
+    int currentTabIndex = pTWQueries->currentIndex();
+    QComboBox *comboBox = comboBoxQueryList[currentTabIndex];
+    int queryIndex = comboBox->itemData(comboBox->currentIndex(), Qt::UserRole).toInt();
+    Query currentQuery = queryList->value(queryIndex);
 
-    //    Query currentQuery = pXMLReader->getQuery(index);
+    if (!pSQL->sqlPrepare(currentQuery.sql)) {
+        QMessageBox::information(0, "Error", "Error prepare query\n" + currentQuery.sql);
+        return;
+    }
 
-    //    pSQL->SqlPrepare(currentQuery.sql);
+    QFormLayout *pFormLayout = formLayoutQueryList.value(currentTabIndex);
+    for(int i = 0; i < currentQuery.ParameterList.size(); ++i)
+    {
+        QLayoutItem *pLayoutItem = dynamic_cast<QLayoutItem *> (pFormLayout->itemAt(i, QFormLayout::FieldRole));
+        QString str;
+        QWidget *parameterWidget = pLayoutItem->widget();
 
-    //    QFormLayout *pFormLayout = dynamic_cast<QFormLayout *> (ui->toolBox->currentWidget()->children().first());
+        if(QDateEdit *pDateEdit = dynamic_cast<QDateEdit *> (parameterWidget)) {
+            str = pDateEdit->date().toString("yyyy-MM-dd");
+            qDebug() << "QDateEdit";
+        } else {
+            if(QDateTimeEdit *pDateTimeEdit = dynamic_cast<QDateTimeEdit *> (parameterWidget)) {
+                str = pDateTimeEdit->dateTime().toString("yyyy-MM-dd hh:mm:ss");
+                qDebug() << "QDateTimeEdit";
+            } else {
+                if(QLineEdit *pLineEdit = dynamic_cast<QLineEdit *> (parameterWidget)) {
+                    str = pLineEdit->text();
+                    qDebug() << "QLineEdit";
+                }
+            }
+        }
+        pSQL->setQueryValue(currentQuery.ParameterList.at(i).value, str);
+    }
 
-    //    for(int i = 0; i < currentQuery.ParameterList.size(); ++i)
-    //    {
-    //        QLayoutItem *pLayoutItem = dynamic_cast<QLayoutItem *> (pFormLayout->itemAt(i, QFormLayout::FieldRole));
-
-    //        QString str;
-
-    //        if(QDateEdit *pDateEdit = dynamic_cast<QDateEdit *> (pLayoutItem->widget()))
-    //        {
-    //            str = pDateEdit->date().toString("yyyy-MM-dd");
-    //        }
-    //        else
-    //            if(QDateTimeEdit *pDateTimeEdit = dynamic_cast<QDateTimeEdit *> (pLayoutItem->widget()))
-    //            {
-    //                str = pDateTimeEdit->dateTime().toString("yyyy-MM-dd hh:mm:ss");
-    //            }
-    //            else
-    //                if(QLineEdit *pLineEdit = dynamic_cast<QLineEdit *> (pLayoutItem->widget()))
-    //                {
-    //                    str = pLineEdit->text();
-    //                }
-    //        qDebug() << currentQuery.ParameterList.at(i).value;
-    //        pSQL->setQueryValue(currentQuery.ParameterList.at(i).value, str);
-    //    }
-
-    //    ui->tableView->setModel(pSQL->QueryExec());
+    ui->tableView->setModel(pSQL->queryExec());
     //    ui->tableView->show();
 }
 
@@ -250,7 +397,7 @@ int MainWindow::isTabExist(QString tabName)
 void MainWindow::addQueryName(QString name, int indexTab, int numQueryInList)
 {
     // Добавили в комбобокс название запроса и номер этого запроса в QueryList
-    listPointsComboBoxQuery[indexTab]->addItem(name, numQueryInList);
+    comboBoxQueryList[indexTab]->addItem(name, numQueryInList);
 }
 
 void MainWindow::movedHorisontalSplitter(int pos, int index)

@@ -13,8 +13,8 @@ public:
 
     bool createConnection();
 
-    QSqlQueryModel *QueryExec();
-    void sqlPrepare (const QString &query);
+    QSqlQueryModel *queryExec();
+    bool sqlPrepare(const QString &query);
     void setQueryValue(const QString &param_name, const QString &value);
     QSqlQueryModel *getSqlModel();
     

@@ -18,7 +18,7 @@ bool SQL::createConnection()
     db.setUserName("root");
     db.setHostName("localhost");
     db.setPort(3306);
-    db.setPassword("12345");
+    db.setPassword("root");
 
     if(!db.open())
     {
@@ -30,26 +30,29 @@ bool SQL::createConnection()
     return true;
 }
 
-QSqlQueryModel * SQL::QueryExec()
+QSqlQueryModel *SQL::queryExec()
 {
     sqlmodel = new QSqlQueryModel();
 
-    sqlquery.exec();
-    sqlmodel->setQuery(sqlquery);
+    if (!sqlquery.exec()) {
+        QMessageBox::information(0, "Error in sql", sqlquery.lastError().text());
+        return sqlmodel;
+    }
 
+    sqlmodel->setQuery(sqlquery);
     if(sqlmodel->lastError().isValid())
     {
         qDebug() << sqlmodel->lastError();
-        return 0;
+        return sqlmodel;
     }
 
     return sqlmodel;
 }
 
-void SQL::sqlPrepare(const QString &query)
+bool SQL::sqlPrepare(const QString &query)
 {
     sqlquery = QSqlQuery(db);
-    qDebug() << sqlquery.prepare(query);
+    return sqlquery.prepare(query);
 }
 
 void SQL::setQueryValue(const QString &param_name, const QString &value)

@@ -14,6 +14,4 @@ private:
     static WidgetsFactory *instance;
 };
 
-WidgetsFactory *WidgetsFactory::instance = NULL;
-
 #endif // WIDGETSFACTORY_H

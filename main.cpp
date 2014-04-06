@@ -14,16 +14,16 @@ int main(int argc, char *argv[])
 
     QApplication a(argc, argv);
 
-    //    SQL * sql_db = new SQL();
+    SQL *sqlDB = new SQL();
     //    MediaPlayer *pMediaPlayer = new MediaPlayer();
-    //    HttpDownload *pHttpDownload = new HttpDownload();
+    HttpDownload *httpDownload = new HttpDownload();
     MainWindow* w = new MainWindow();
     //    w->setAttribute(Qt::WA_AlwaysShowToolTips, true);
-    //    w->setSQL(sql_db);
+    w->setSQL(sqlDB);
     //    w->setMediaPlayer(pMediaPlayer);
-    //    w->setHttpDownload(pHttpDownload);
+    w->setHttpDownload(httpDownload);
 
-    //    sql_db->createConnection();
+    sqlDB->createConnection();
     w->showMaximized();
 
     return a.exec();

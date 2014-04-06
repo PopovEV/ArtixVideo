@@ -8,6 +8,7 @@
 #include "longintvalidator.h"
 #include "currencyvalidator.h"
 
+WidgetsFactory *WidgetsFactory::instance = NULL;
 
 WidgetsFactory *WidgetsFactory::getInstance()
 {

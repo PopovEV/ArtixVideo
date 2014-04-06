@@ -7,7 +7,7 @@ class DockWidget : public QDockWidget
 {
     Q_OBJECT
 public:
-    explicit DockWidget(const QString & title, QWidget * parent = 0, Qt::WFlags flags = 0);
+    explicit DockWidget(QWidget * parent = 0, const QString & title = QString(), Qt::WFlags flags = 0);
     ~DockWidget();
 
     QSize sizeHint() const;
