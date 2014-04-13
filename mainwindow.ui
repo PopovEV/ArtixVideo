@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>752</width>
-    <height>583</height>
+    <width>847</width>
+    <height>564</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -65,18 +65,21 @@ QMainWindow::separator::horizontal {
      <verstretch>0</verstretch>
     </sizepolicy>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout">
+   <layout class="QVBoxLayout" name="verticalLayout_5">
+    <property name="spacing">
+     <number>0</number>
+    </property>
     <property name="leftMargin">
-     <number>3</number>
+     <number>2</number>
     </property>
     <property name="topMargin">
-     <number>3</number>
+     <number>2</number>
     </property>
     <property name="rightMargin">
-     <number>3</number>
+     <number>2</number>
     </property>
     <property name="bottomMargin">
-     <number>3</number>
+     <number>2</number>
     </property>
     <item>
      <widget class="DockWidget" name="DWVideo">
@@ -90,24 +93,81 @@ QMainWindow::separator::horizontal {
        <set>Qt::TopDockWidgetArea</set>
       </property>
       <widget class="QWidget" name="dockWidgetContents">
-       <layout class="QVBoxLayout" name="verticalLayout_2">
-        <property name="leftMargin">
+       <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,0">
+        <property name="spacing">
          <number>3</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
         </property>
         <property name="topMargin">
-         <number>3</number>
+         <number>0</number>
         </property>
         <property name="rightMargin">
-         <number>3</number>
+         <number>0</number>
         </property>
         <property name="bottomMargin">
-         <number>3</number>
+         <number>0</number>
         </property>
         <item>
-         <widget class="Phonon::VideoPlayer" name="videoPlayer" native="true"/>
+         <layout class="QVBoxLayout" name="verticalLayout">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="Phonon::VideoPlayer" name="videoPlayer" native="true"/>
+          </item>
+          <item>
+           <widget class="QProgressBar" name="progressBar_BufferingVideo">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>5</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>5</height>
+             </size>
+            </property>
+            <property name="value">
+             <number>24</number>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+            <property name="textVisible">
+             <bool>false</bool>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QPushButton" name="pushButton_PreviewFragment">
+            <property name="minimumSize">
+             <size>
+              <width>30</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>30</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>|&lt;</string>
+            </property>
+           </widget>
+          </item>
           <item>
            <widget class="QPushButton" name="pushButton_Play">
             <property name="minimumSize">
@@ -155,7 +215,87 @@ QMainWindow::separator::horizontal {
            </widget>
           </item>
           <item>
+           <widget class="QPushButton" name="pushButton_NextFragment">
+            <property name="minimumSize">
+             <size>
+              <width>30</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>30</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>&gt;|</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="Phonon::SeekSlider" name="seekSlider" native="true"/>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <property name="spacing">
+             <number>1</number>
+            </property>
+            <property name="sizeConstraint">
+             <enum>QLayout::SetFixedSize</enum>
+            </property>
+            <item>
+             <widget class="QLabel" name="label_currentTime">
+              <property name="font">
+               <font>
+                <pointsize>9</pointsize>
+                <italic>true</italic>
+                <stylestrategy>PreferDefault</stylestrategy>
+               </font>
+              </property>
+              <property name="text">
+               <string>00:00:00</string>
+              </property>
+              <property name="textFormat">
+               <enum>Qt::RichText</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label">
+              <property name="font">
+               <font>
+                <pointsize>9</pointsize>
+                <italic>true</italic>
+                <stylestrategy>PreferDefault</stylestrategy>
+               </font>
+              </property>
+              <property name="text">
+               <string>|</string>
+              </property>
+              <property name="textFormat">
+               <enum>Qt::RichText</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_maxTime">
+              <property name="font">
+               <font>
+                <pointsize>9</pointsize>
+                <italic>true</italic>
+                <stylestrategy>PreferDefault</stylestrategy>
+               </font>
+              </property>
+              <property name="text">
+               <string>00:00:00</string>
+              </property>
+              <property name="textFormat">
+               <enum>Qt::RichText</enum>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
           <item>
            <widget class="Phonon::VolumeSlider" name="volumeSlider" native="true">
@@ -167,6 +307,25 @@ QMainWindow::separator::horizontal {
             </property>
             <property name="muteVisible" stdset="0">
              <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButton_FullScreen">
+            <property name="minimumSize">
+             <size>
+              <width>30</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>30</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>full</string>
             </property>
            </widget>
           </item>
@@ -183,7 +342,7 @@ QMainWindow::separator::horizontal {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>752</width>
+     <width>847</width>
      <height>20</height>
     </rect>
    </property>
@@ -215,7 +374,22 @@ QMainWindow::separator::horizontal {
     <number>1</number>
    </attribute>
    <widget class="QWidget" name="dockWidgetContents_2">
-    <layout class="QVBoxLayout" name="verticalLayout_3">
+    <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,0">
+     <property name="spacing">
+      <number>4</number>
+     </property>
+     <property name="leftMargin">
+      <number>4</number>
+     </property>
+     <property name="topMargin">
+      <number>4</number>
+     </property>
+     <property name="rightMargin">
+      <number>4</number>
+     </property>
+     <property name="bottomMargin">
+      <number>4</number>
+     </property>
      <item>
       <widget class="QTabWidget" name="tabWidget">
        <property name="tabPosition">
@@ -256,6 +430,9 @@ QMainWindow::separator::horizontal {
          <property name="text">
           <string>Поиск</string>
          </property>
+         <property name="autoDefault">
+          <bool>true</bool>
+         </property>
         </widget>
        </item>
        <item>
@@ -292,16 +469,16 @@ QMainWindow::separator::horizontal {
    <widget class="QWidget" name="dockWidgetContents_3">
     <layout class="QVBoxLayout" name="verticalLayout_4">
      <property name="leftMargin">
-      <number>3</number>
+      <number>4</number>
      </property>
      <property name="topMargin">
-      <number>3</number>
+      <number>4</number>
      </property>
      <property name="rightMargin">
-      <number>3</number>
+      <number>4</number>
      </property>
      <property name="bottomMargin">
-      <number>3</number>
+      <number>4</number>
      </property>
      <item>
       <widget class="QTableView" name="tableView"/>
@@ -322,7 +499,31 @@ QMainWindow::separator::horizontal {
    <attribute name="dockWidgetArea">
     <number>2</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents_5"/>
+   <widget class="QWidget" name="dockWidgetContents_5">
+    <layout class="QVBoxLayout" name="verticalLayout_6">
+     <property name="spacing">
+      <number>4</number>
+     </property>
+     <property name="leftMargin">
+      <number>4</number>
+     </property>
+     <property name="topMargin">
+      <number>4</number>
+     </property>
+     <property name="rightMargin">
+      <number>4</number>
+     </property>
+     <property name="bottomMargin">
+      <number>4</number>
+     </property>
+     <item>
+      <widget class="QTableView" name="tableView_Events"/>
+     </item>
+     <item>
+      <widget class="QListView" name="listView_Events"/>
+     </item>
+    </layout>
+   </widget>
   </widget>
   <action name="actionHttp">
    <property name="text">

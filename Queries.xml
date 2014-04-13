@@ -34,7 +34,7 @@
 	  </description>
         <SQL>
 	    select *, date_begin AS "Время"
-            from pos_log_master
+            from POS_LOG_MASTER
 			where Amount = :Amount
         </SQL>
         <parameters>
@@ -46,9 +46,7 @@
 
 	  </description>
 	<SQL>
-            select *
-            from pos_log_master
-			where Amount = :Amount
+            select * from POS_LOG_MASTER where Amount = :Amount
         </SQL>
         <parameters>
 		<parameter value = "Amount" name = "Стоимость: " type = "date"/>
@@ -59,8 +57,7 @@
 
 	</description>
         <SQL>
-	    select *, STIME AS "Время"
-	    from subtitles
+            select *, STIME AS 'Время' from SUBTITLES
         </SQL>
         <parameters>
 		<!-- <parameter value = "Amount" name = "Стоимость: " type = "currency"/> -->

@@ -13,15 +13,12 @@ int main(int argc, char *argv[])
     QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
 
     QApplication a(argc, argv);
+    a.setApplicationName("ArtixVideo");
 
     SQL *sqlDB = new SQL();
-    //    MediaPlayer *pMediaPlayer = new MediaPlayer();
-    HttpDownload *httpDownload = new HttpDownload();
     MainWindow* w = new MainWindow();
     //    w->setAttribute(Qt::WA_AlwaysShowToolTips, true);
     w->setSQL(sqlDB);
-    //    w->setMediaPlayer(pMediaPlayer);
-    w->setHttpDownload(httpDownload);
 
     sqlDB->createConnection();
     w->showMaximized();

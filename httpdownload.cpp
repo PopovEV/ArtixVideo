@@ -131,9 +131,10 @@ HttpDownload::HttpDownload(QObject *parent) :
 
 //}
 
-bool HttpDownload::doDownload(const QUrl &url)
+bool HttpDownload::doDownload(const QUrl &url, QString &nameFolder)
 {
     lastUrl = url;
+    queueUrl.insert(url.toString(), nameFolder);
     QNetworkRequest request(url);
     QNetworkReply *reply = manager.get(request);
 }
@@ -159,11 +160,11 @@ void HttpDownload::downloadFinished(QNetworkReply *reply)
     reply->deleteLater();
 }
 
-bool HttpDownload::saveToDisk(const QString &filename, QIODevice *data)
+bool HttpDownload::saveToDisk(const QString &fileName, QIODevice *data)
 {
-    QFile file(filename);
+    QFile file(fileName);
     if (!file.open(QIODevice::WriteOnly)) {
-        qDebug() << tr("Не возможно открыть %1 для записи: %2").arg(filename).arg(file.errorString());
+        qDebug() << tr("Не возможно открыть %1 для записи: %2").arg(fileName).arg(file.errorString());
         return false;
     }
 
@@ -175,8 +176,11 @@ bool HttpDownload::saveToDisk(const QString &filename, QIODevice *data)
 
 QString HttpDownload::saveFileName(const QUrl &url)
 {
+    qDebug() << url;
     QString path = url.path();
+    qDebug() << path;
     QString basename = QFileInfo(path).fileName();
+    qDebug() << basename;
 
     if (basename.isEmpty())
         basename = "index.html";
@@ -184,13 +188,17 @@ QString HttpDownload::saveFileName(const QUrl &url)
     QDir dir = QDir::currentPath();
     if(!dir.exists("download"))
         dir.mkdir("download");
+    dir.cd("download");
+
+    QString folderName = queueUrl.take(url.toString());
+    if(!dir.exists(folderName))
+        dir.mkdir(folderName);
+    dir.cd(folderName);
 
     if (QFile::exists(basename))
-    {
         QFile::remove(basename);
-    }
 
-    return "download/" + basename;
+    return dir.absolutePath() + "/" + basename;
 }
 
 

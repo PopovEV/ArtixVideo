@@ -1,78 +1,90 @@
 #include "mediaplayer.h"
-#include <QObject>
+#include <QLabel>
+#include <QTime>
 
-MediaPlayer::MediaPlayer(QWidget *parent) :
-    QWidget(parent)
+MediaPlayer::MediaPlayer(VideoPlayer *videoPlayer, SeekSlider *seekSlider, VolumeSlider *volumeSlider,
+                         QObject *parent) : QObject(parent)
 {
-    pMediaObject = new MediaObject(this);
-    pVideoWidget = new VideoWidget;
-    pAudioOutput = new AudioOutput(Phonon::VideoCategory, this);
+    this->videoPlayer = videoPlayer;
+    mediaObject = this->videoPlayer->mediaObject();
+    this->seekSlider = seekSlider;
+    this->volumeSlider = volumeSlider;
 
-    createPath(pMediaObject, pVideoWidget);
-    createPath(pMediaObject, pAudioOutput);
+    seekSlider->setMediaObject(mediaObject);
+    volumeSlider->setAudioOutput(videoPlayer->audioOutput());
 
-    connect(this, SIGNAL(seekChanged(qint64)), pMediaObject, SLOT(seek(qint64)));
-    connect(pMediaObject, SIGNAL(stateChanged(Phonon::State,Phonon::State)), this, SLOT(seek(Phonon::State,Phonon::State)));
+    startTime = new QTime();
+    selectedTime = new QTime();
+
+    mediaObject->setTickInterval(1000);
+    connect(mediaObject, SIGNAL(stateChanged(Phonon::State,Phonon::State)),
+            this, SLOT(stateChanged(Phonon::State,Phonon::State)));
+    connect(mediaObject, SIGNAL(tick(qint64)), this, SLOT(setCurrentTime()));
 }
 
-MediaObject *MediaPlayer::getMediaObject()
+MediaPlayer::~MediaPlayer()
 {
-    return pMediaObject;
+
 }
 
-void MediaPlayer::setParentForVideoWidget(QWidget *p)
+void MediaPlayer::playVideo(const QString &path, const QTime &startTime, const QTime &selectedTime)
 {
-    pVideoWidget->setParent(p);
-    pVideoWidget->move(0,0);
-    pVideoWidget->setFixedSize(p->parentWidget()->width(), p->parentWidget()->height() - 40);
-}
-
-VideoWidget *MediaPlayer::getVideoWidget()
-{
-    return pVideoWidget;
-}
-
-void MediaPlayer::setSeekSlider(QHBoxLayout *layout)
-{
-    pSeekSlider = new SeekSlider(pMediaObject);
-    layout->insertWidget(4, pSeekSlider, 0, 0);
-}
-
-void MediaPlayer::setVolumeSlider(QHBoxLayout *layout)
-{
-    pVolumeSlider = new VolumeSlider(pAudioOutput);
-    pVolumeSlider->setOrientation(Qt::Horizontal);
-    layout->insertWidget(6, pVolumeSlider, 0, 0);
-}
-
-void MediaPlayer::slotLoad()
-{
-    QString str = QFileDialog::getOpenFileName(0, "Load", "", "*.*");
-    if (!str.isEmpty())
-    {
-        pMediaObject->setCurrentSource(MediaSource(str));
-        emit pMediaObject->play();
+    if (!path.isEmpty()) {
+        this->startTime->setHMS(startTime.hour(), startTime.minute(), startTime.second());
+        this->selectedTime->setHMS(selectedTime.hour(), selectedTime.minute(), selectedTime.second());
+        timeDifference = startTime.msecsTo(selectedTime);
+        videoPlayer->load(MediaSource(path));
+        videoPlayer->play();
     }
 }
 
-void MediaPlayer::loadVideo(const QString &path, const QDateTime &selectDateTime)
+void MediaPlayer::stateChanged(State newstate, State oldstate)
 {
-    if (!path.isEmpty())
-    {
-        QTime timeStartVideo;
-        timeStartVideo = QTime::fromString(path.mid(9, 6), "hhmmss");
-        timeDifference = timeStartVideo.msecsTo(selectDateTime.time());
-        //timeDifference -= 5000;
+    if(newstate == Phonon::PlayingState || newstate == Phonon::BufferingState
+            || newstate == Phonon::PausedState) {
+        if(oldstate == Phonon::PausedState && newstate == Phonon::PlayingState) {
+            return;
+        }
+        if(oldstate == Phonon::PlayingState && newstate == Phonon::PausedState) {
+            return;
+        }
 
-        pMediaObject->setCurrentSource(MediaSource(path));
-        emit pMediaObject->play();
+        videoPlayer->seek(timeDifference);
+
+        qint64 totalTimeInMsec = mediaObject->totalTime();
+//        QTime totalTime(totalTimeInMsec / (1000 * 60 * 60) % 60, totalTimeInMsec / (1000 * 60) % 60,
+//                        totalTimeInMsec / (1000) % 60);
+        QTime totalTime = startTime->addMSecs(totalTimeInMsec);
+        maxTimeLabel->setText(totalTime.toString("hh:mm:ss"));
     }
 }
 
-void MediaPlayer::seek(State newstate, State oldstate)
+void MediaPlayer::setCurrentTime()
 {
-    if(newstate == Phonon::PlayingState || newstate == Phonon::BufferingState || newstate == Phonon::PausedState)
-    {
-        emit seekChanged(timeDifference);
-    }
+    qint64 currentTimeMsec = mediaObject->currentTime();
+//    QTime totalTime(currentTime / (1000 * 60 * 60) % 60, currentTime / (1000 * 60) % 60,
+//                    currentTime / (1000) % 60);
+    QTime currentTime = startTime->addMSecs(currentTimeMsec);
+    currentTimeLabel->setText(currentTime.toString("hh:mm:ss"));
 }
+
+QLabel *MediaPlayer::getCurrentTimeLabel() const
+{
+    return currentTimeLabel;
+}
+
+void MediaPlayer::setCurrentTimeLabel(QLabel *value)
+{
+    currentTimeLabel = value;
+}
+
+QLabel *MediaPlayer::getMaxTimeLabel() const
+{
+    return maxTimeLabel;
+}
+
+void MediaPlayer::setMaxTimeLabel(QLabel *value)
+{
+    maxTimeLabel = value;
+}
+

@@ -36,8 +36,6 @@ public:
     MainWindowMemento *createMemento();
 
     void setSQL(SQL *p);
-    void setMediaPlayer(MediaPlayer *p);
-    void setHttpDownload(HttpDownload *p);
 
     Ui::MainWindow *ui;
 
@@ -52,21 +50,19 @@ public:
 
 private:
     SQL *pSQL;
-    MediaPlayer *pMediaPlayer;
-    HttpDownload *httpDownload;
+    MediaPlayer *mediaPlayer;
 
     QList<QComboBox *> comboBoxQueryList;        // указатели на комбобоксы, соответствующие каждой вкладке
     QList<QTextEdit *> descriptionList;          // указатели на текстовые поля для описания запроса для каждой вкладке
     QList<QGroupBox *> groupBoxQueryList;        // указатели на бокс группировки параметров запросов
+    QList<QWidget *> widgetInScrollList;
     QList<QFormLayout *> formLayoutQueryList;
 
     QList<Query> *queryList;
 
     void clean(QLayout &oL);
-    void downloadFile(QDateTime &selectedTime);
-    bool downloadIndexFile(QDateTime &selectedTime);
-    QStringList getVideoFileNames(QString indexFileName);
-    QString searchSuitableFileName(const QStringList &videoFileNames, QDateTime *selectedDateTime);
+    void cleanFormLayout(QFormLayout *formLayout);
+
 signals:
 
 

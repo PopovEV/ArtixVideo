@@ -15,13 +15,14 @@ private:
     QString path;
     QString lastFileName;
     QNetworkAccessManager manager;
+    QMap<QString, QString> queueUrl; // key - url, value - name folder kuda nugno sohranit fayl
     bool checkUrl(const QUrl *url);
 
 public:
     explicit HttpDownload(QObject *parent = 0);
 
-    bool doDownload(const QUrl &url);
-    bool saveToDisk(const QString &filename, QIODevice *data);
+    bool doDownload(const QUrl &url, QString &nameFolder);
+    bool saveToDisk(const QString &fileName, QIODevice *data);
     QString saveFileName(const QUrl &url);
 
     QString getLastFileName() const;

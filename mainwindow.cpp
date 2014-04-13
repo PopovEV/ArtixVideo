@@ -4,6 +4,7 @@
 #include <QtGui>
 #include <QDebug>
 #include <QEventLoop>
+#include "videomanager.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -25,12 +26,17 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->pushButton_Find, SIGNAL(clicked()), this, SLOT(clickedFind()));
     connect(ui->tableView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(getDateTimeFromCurrentRow(QModelIndex)));
 
-    //    connect(ui->HorisontalSplitter, SIGNAL(splitterMoved(int,int)), this, SLOT(movedHorisontalSplitter(int,int)));
-
-    //    ui->tableView->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
-
     loadQueries();
     createQueryInterface();
+
+    mediaPlayer = new MediaPlayer(ui->videoPlayer, ui->seekSlider, ui->volumeSlider);
+    mediaPlayer->setCurrentTimeLabel(ui->label_currentTime);
+    mediaPlayer->setMaxTimeLabel(ui->label_maxTime);
+    connect(ui->pushButton_Play, SIGNAL(clicked()), ui->videoPlayer, SLOT(play()));
+    connect(ui->pushButton_Pause, SIGNAL(clicked()), ui->videoPlayer, SLOT(pause()));
+    connect(ui->videoPlayer->mediaObject(), SIGNAL(bufferStatus(int)),
+            ui->progressBar_BufferingVideo, SLOT(setValue(int)));
+    connect(ui->pushButton_FullScreen, SIGNAL(clicked()), ui->videoPlayer->videoWidget(), SLOT(enterFullScreen()));
 
     // Восстанавливаем вид главного окна
     MainWindowMemento *memento = createMemento();
@@ -40,6 +46,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    delete mediaPlayer;
     delete ui;
 }
 
@@ -47,6 +54,8 @@ void MainWindow::createInterface()
 {
     ui->tabWidget->clear();
     ui->volumeSlider->setOrientation(Qt::Horizontal);
+    ui->progressBar_BufferingVideo->setValue(0);
+    ui->pushButton_Find->setDefault(true);
 }
 
 void MainWindow::setMemento(MainWindowMemento *memento)
@@ -94,6 +103,7 @@ int MainWindow::addTabQueries(QString name)
     comboBoxQueryList.push_back(pCB);
     descriptionList.push_back(pTE);
     groupBoxQueryList.push_back(pGB);
+    widgetInScrollList.push_back(scrollWidget);
     formLayoutQueryList.push_back(pFL);
 
     // добавляем вкладку
@@ -115,26 +125,6 @@ void MainWindow::setSQL(SQL *p)
     pSQL = p;
 }
 
-void MainWindow::setMediaPlayer(MediaPlayer *p)
-{
-    pMediaPlayer = p;
-    //    connect(ui->PlayButton, SIGNAL(clicked()), pMediaPlayer->getMediaObject(), SLOT(play()));
-    //    connect(ui->PauseButton, SIGNAL(clicked()), pMediaPlayer->getMediaObject(), SLOT(pause()));
-    //    connect(ui->LoadButton, SIGNAL(clicked()), pMediaPlayer, SLOT(slotLoad()));
-    //    connect(ui->tableView, SIGNAL(doubleClicked(QModelIndex)), pMediaPlayer->getMediaObject(), SLOT(stop()));
-    //    connect(ui->tableView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(getDateTimeFromCurrentRow(QModelIndex)));
-
-    //    pMediaPlayer->setParentForVideoWidget(ui->VideoFrame1);
-    //    pMediaPlayer->setSeekSlider(ui->NavigationHorizontalLayout);
-    //    pMediaPlayer->setVolumeSlider(ui->NavigationHorizontalLayout);
-}
-
-void MainWindow::setHttpDownload(HttpDownload *p)
-{
-    httpDownload = p;
-    //    connect(pHttpDownload, SIGNAL(fileDownloaded(QString)), pMediaPlayer, SLOT(loadVideo(QString)));
-}
-
 void MainWindow::getDateTimeFromCurrentRow(QModelIndex ModelIndex)
 {
     int currentRow = ModelIndex.row();
@@ -148,8 +138,14 @@ void MainWindow::getDateTimeFromCurrentRow(QModelIndex ModelIndex)
         if(headerData == tr("ВРЕМЯ"))
         {
             QModelIndex newModelIndex = pSqlModel->index(currentRow, i, QModelIndex());
-            QDateTime selectedTime = pSqlModel->data(newModelIndex, Qt::DisplayRole).toDateTime();
-            downloadFile(selectedTime);
+            QDateTime selectedDateTime = pSqlModel->data(newModelIndex, Qt::DisplayRole).toDateTime();
+            //downloadFile(selectedTime);
+            QPair<QString, QTime> videoFilePathAndStartTime =
+                    VideoManager::getInstance()->getVideo(selectedDateTime);
+            qDebug() << videoFilePathAndStartTime.first;
+            qDebug() << videoFilePathAndStartTime.second;
+            mediaPlayer->playVideo(videoFilePathAndStartTime.first, videoFilePathAndStartTime.second,
+                                   selectedDateTime.time());
             return;
         }
     }
@@ -199,125 +195,24 @@ void MainWindow::clean( QLayout &oL )
             {
                 delete poW;
             }
+        delete poLI;
         if (oL.count() == 0)
             return;
     }
 }
 
-void MainWindow::downloadFile(QDateTime &selectedTime)
+void MainWindow::cleanFormLayout(QFormLayout *formLayout)
 {
-    if (!downloadIndexFile(selectedTime)) {
-        return;
-    }
-
-    QString indexFileName = httpDownload->getLastFileName();
-    QStringList videoFileNames = getVideoFileNames(indexFileName);
-    if(videoFileNames.isEmpty()) {
-        QMessageBox::information(this, "Information", "There are no videos for the selected day.");
-        return;
-    }
-
-    QString fileName = searchSuitableFileName(videoFileNames, &selectedTime);
-    if(fileName.isEmpty()) {
-       return;
-    }
-
-    //Download suitable file
-    QString date;
-    date = selectedTime.date().toString("yyyyMMdd");
-
-    QUrl videoFile("http://localhost/artixvideo/" + date + "/" + fileName);
-    QEventLoop eventLoop;
-    connect(httpDownload, SIGNAL(fileDownloaded()), &eventLoop, SLOT(quit()));
-    httpDownload->doDownload(videoFile);
-    eventLoop.exec();
-
-    QString videoFileName = httpDownload->getLastFileName();
-    if(videoFileName.isNull()) {
-        return;
-    }
-
-    qDebug() << "Play video " << videoFile.toString();
-}
-
-bool MainWindow::downloadIndexFile(QDateTime &selectedTime)
-{
-    QString date;
-    date = selectedTime.date().toString("yyyyMMdd");
-
-    QUrl indexFileUrl("http://localhost/artixvideo/" + date + "/");
-    QEventLoop eventLoop;
-    connect(httpDownload, SIGNAL(fileDownloaded()), &eventLoop, SLOT(quit()));
-    httpDownload->doDownload(indexFileUrl);
-    eventLoop.exec();
-
-    QString indexFileName = httpDownload->getLastFileName();
-    if(indexFileName.isEmpty()) {
-        qDebug() << "Error download index file: " << indexFileUrl.toString();
-        return false;
-    }
-
-    return true;
-}
-
-QStringList MainWindow::getVideoFileNames(QString indexFileName)
-{
-    QStringList fileNamesList;
-    QFile indexFile(indexFileName);
-    if(!indexFile.open(QFile::ReadOnly)) {
-        qDebug() << "Error opening index file!";
-        return fileNamesList;
-    }
-
-    QString data(indexFile.readAll());
-    QRegExp regExpr("\\d*-INJ.flv", Qt::CaseInsensitive);
-    int pos = 0;
-    while ((pos = regExpr.indexIn(data, pos)) != -1) {
-        if(!fileNamesList.isEmpty()) {
-            if(fileNamesList.last() != regExpr.cap(0)) {
-                fileNamesList.push_back(regExpr.cap(0));
-            }
-        } else {
-            fileNamesList.push_back(regExpr.cap(0));
-        }
-        pos += regExpr.matchedLength();
-    }
-
-    return fileNamesList;
-}
-
-QString MainWindow::searchSuitableFileName(const QStringList &videoFileNames, QDateTime *selectedDateTime)
-{
-    QList<QTime> timeStartVideo;
-    QRegExp regExpr("\\d{6,6}");
-    foreach (QString fileName, videoFileNames) {
-        if (regExpr.indexIn(fileName) != -1) {
-            QString timeStr = regExpr.cap(0);
-            QTime time = QTime::fromString(timeStr, "hhmmss");
-            if (time.isValid()) {
-                timeStartVideo.push_back(time);
-            } else {
-                qDebug() << "Time is not valid " << timeStr;
-            }
+    while (formLayout->count()) {
+        QLayoutItem *item = formLayout->itemAt(0);
+        if (item) {
+            QWidget *widget = item->widget();
+            formLayout->removeItem(item);
+            formLayout->removeWidget(widget);
+            delete widget;
+            delete item;
         }
     }
-
-    QTime selectedTime = selectedDateTime->time();
-    QTime suitableTime;
-    foreach (QTime time, timeStartVideo) {
-        //TODO: Replace 300 sec by get option "VideoLenght" from config.ini
-        if(selectedTime >= time && selectedTime < time.addSecs(300)) {
-            suitableTime = time;
-        }
-    }
-
-    if(suitableTime.isNull()) {
-        QMessageBox::information(this, "Поиск видеофайла",
-                                 "Не удается найти подходящий по времени видеофрагмент.");
-        return QString();
-    }
-
-    return suitableTime.toString("hhmmss") + "-INJ.flv";
 }
 
 void MainWindow::activateQuery(int index)
@@ -328,12 +223,22 @@ void MainWindow::activateQuery(int index)
 
     //Create widgets for input sql parameters
     QFormLayout *formLayout = formLayoutQueryList[currentTabIndex];
-    clean(*formLayout);
+//    clean(*formLayout);
+    cleanFormLayout(formLayout);
+    delete formLayout;
+
+    formLayout = new QFormLayout();
+    formLayout->setRowWrapPolicy(QFormLayout::WrapLongRows);
+    formLayout->setContentsMargins(3, 3, 3, 3);
+    formLayoutQueryList[currentTabIndex] = formLayout;
+    widgetInScrollList[currentTabIndex]->setLayout(formLayout);
 
     const Query &selectedQuery = queryList->at(queryIndex);
     descriptionList.at(currentTabIndex)->setText(selectedQuery.description);
 
     foreach (Parameter param, selectedQuery.ParameterList) {
+        qDebug() << param.name;
+        qDebug() << param.type;
         formLayout->addRow(param.name,
                            WidgetsFactory::getInstance()->getWidget(param.type));
     }
@@ -358,9 +263,18 @@ void MainWindow::clickedFind()
     }
 
     QFormLayout *pFormLayout = formLayoutQueryList.value(currentTabIndex);
+    if (pFormLayout->rowCount() != currentQuery.ParameterList.size()) {
+        qDebug() << "Количество параметров на форме не соответсвует количеству параметров в sql запросе";
+        qDebug() << pFormLayout->rowCount() << " " << currentQuery.ParameterList.size();
+        return;
+    }
+
     for(int i = 0; i < currentQuery.ParameterList.size(); ++i)
     {
         QLayoutItem *pLayoutItem = dynamic_cast<QLayoutItem *> (pFormLayout->itemAt(i, QFormLayout::FieldRole));
+        if (!pLayoutItem) {
+            qDebug() << "Error dynamic_cast<QLayoutItem *>";
+        }
         QString str;
         QWidget *parameterWidget = pLayoutItem->widget();
 
@@ -382,7 +296,7 @@ void MainWindow::clickedFind()
     }
 
     ui->tableView->setModel(pSQL->queryExec());
-    //    ui->tableView->show();
+    ui->tableView->resizeColumnsToContents();
 }
 
 int MainWindow::isTabExist(QString tabName)
@@ -431,4 +345,9 @@ void MainWindow::closeEvent(QCloseEvent *pe)
     MainWindowMemento *memento = createMemento();
     memento->saveState();
     delete memento;
+
+    // Clear download folder
+    QDir dir(QDir::currentPath());
+    dir.cd("download");
+    removeDir(dir.path());
 }

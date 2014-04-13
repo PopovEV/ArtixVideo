@@ -23,7 +23,9 @@ SOURCES += main.cpp\
     httpdownload.cpp \
     dockwidget.cpp \
     widgetsfactory.cpp \
-    mainwindowmemento.cpp
+    mainwindowmemento.cpp \
+    videomanager.cpp \
+    config.cpp
 
 HEADERS  += mainwindow.h \
     sql.h \
@@ -36,7 +38,9 @@ HEADERS  += mainwindow.h \
     dockwidget.h \
     widgetsfactory.h \
     mainwindowmemento.h \
-    global.h
+    global.h \
+    videomanager.h \
+    config.h
 
 FORMS    += mainwindow.ui
 

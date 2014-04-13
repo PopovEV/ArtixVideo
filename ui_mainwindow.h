@@ -15,9 +15,12 @@
 #include <QtGui/QButtonGroup>
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QHeaderView>
+#include <QtGui/QLabel>
+#include <QtGui/QListView>
 #include <QtGui/QMainWindow>
 #include <QtGui/QMenu>
 #include <QtGui/QMenuBar>
+#include <QtGui/QProgressBar>
 #include <QtGui/QPushButton>
 #include <QtGui/QSpacerItem>
 #include <QtGui/QTabWidget>
@@ -36,16 +39,25 @@ class Ui_MainWindow
 public:
     QAction *actionHttp;
     QWidget *centralWidget;
-    QVBoxLayout *verticalLayout;
+    QVBoxLayout *verticalLayout_5;
     DockWidget *DWVideo;
     QWidget *dockWidgetContents;
     QVBoxLayout *verticalLayout_2;
+    QVBoxLayout *verticalLayout;
     Phonon::VideoPlayer *videoPlayer;
+    QProgressBar *progressBar_BufferingVideo;
     QHBoxLayout *horizontalLayout;
+    QPushButton *pushButton_PreviewFragment;
     QPushButton *pushButton_Play;
     QPushButton *pushButton_Pause;
+    QPushButton *pushButton_NextFragment;
     Phonon::SeekSlider *seekSlider;
+    QHBoxLayout *horizontalLayout_3;
+    QLabel *label_currentTime;
+    QLabel *label;
+    QLabel *label_maxTime;
     Phonon::VolumeSlider *volumeSlider;
+    QPushButton *pushButton_FullScreen;
     QMenuBar *menuBar;
     QMenu *menu;
     QMenu *menuSettings;
@@ -65,12 +77,15 @@ public:
     QTableView *tableView;
     DockWidget *DWEvent;
     QWidget *dockWidgetContents_5;
+    QVBoxLayout *verticalLayout_6;
+    QTableView *tableView_Events;
+    QListView *listView_Events;
 
     void setupUi(QMainWindow *MainWindow)
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
-        MainWindow->resize(752, 583);
+        MainWindow->resize(847, 564);
         QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -114,11 +129,11 @@ public:
         sizePolicy1.setVerticalStretch(0);
         sizePolicy1.setHeightForWidth(centralWidget->sizePolicy().hasHeightForWidth());
         centralWidget->setSizePolicy(sizePolicy1);
-        verticalLayout = new QVBoxLayout(centralWidget);
-        verticalLayout->setSpacing(6);
-        verticalLayout->setContentsMargins(11, 11, 11, 11);
-        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
-        verticalLayout->setContentsMargins(3, 3, 3, 3);
+        verticalLayout_5 = new QVBoxLayout(centralWidget);
+        verticalLayout_5->setSpacing(0);
+        verticalLayout_5->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_5->setObjectName(QString::fromUtf8("verticalLayout_5"));
+        verticalLayout_5->setContentsMargins(2, 2, 2, 2);
         DWVideo = new DockWidget(centralWidget);
         DWVideo->setObjectName(QString::fromUtf8("DWVideo"));
         DWVideo->setFloating(false);
@@ -127,18 +142,42 @@ public:
         dockWidgetContents = new QWidget();
         dockWidgetContents->setObjectName(QString::fromUtf8("dockWidgetContents"));
         verticalLayout_2 = new QVBoxLayout(dockWidgetContents);
-        verticalLayout_2->setSpacing(6);
+        verticalLayout_2->setSpacing(3);
         verticalLayout_2->setContentsMargins(11, 11, 11, 11);
         verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
-        verticalLayout_2->setContentsMargins(3, 3, 3, 3);
+        verticalLayout_2->setContentsMargins(0, 0, 0, 0);
+        verticalLayout = new QVBoxLayout();
+        verticalLayout->setSpacing(0);
+        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         videoPlayer = new Phonon::VideoPlayer(dockWidgetContents);
         videoPlayer->setObjectName(QString::fromUtf8("videoPlayer"));
 
-        verticalLayout_2->addWidget(videoPlayer);
+        verticalLayout->addWidget(videoPlayer);
+
+        progressBar_BufferingVideo = new QProgressBar(dockWidgetContents);
+        progressBar_BufferingVideo->setObjectName(QString::fromUtf8("progressBar_BufferingVideo"));
+        progressBar_BufferingVideo->setMinimumSize(QSize(0, 5));
+        progressBar_BufferingVideo->setMaximumSize(QSize(16777215, 5));
+        progressBar_BufferingVideo->setValue(24);
+        progressBar_BufferingVideo->setAlignment(Qt::AlignCenter);
+        progressBar_BufferingVideo->setTextVisible(false);
+        progressBar_BufferingVideo->setOrientation(Qt::Horizontal);
+
+        verticalLayout->addWidget(progressBar_BufferingVideo);
+
+
+        verticalLayout_2->addLayout(verticalLayout);
 
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setSpacing(6);
         horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
+        pushButton_PreviewFragment = new QPushButton(dockWidgetContents);
+        pushButton_PreviewFragment->setObjectName(QString::fromUtf8("pushButton_PreviewFragment"));
+        pushButton_PreviewFragment->setMinimumSize(QSize(30, 30));
+        pushButton_PreviewFragment->setMaximumSize(QSize(30, 30));
+
+        horizontalLayout->addWidget(pushButton_PreviewFragment);
+
         pushButton_Play = new QPushButton(dockWidgetContents);
         pushButton_Play->setObjectName(QString::fromUtf8("pushButton_Play"));
         pushButton_Play->setMinimumSize(QSize(35, 35));
@@ -159,10 +198,49 @@ public:
 
         horizontalLayout->addWidget(pushButton_Pause);
 
+        pushButton_NextFragment = new QPushButton(dockWidgetContents);
+        pushButton_NextFragment->setObjectName(QString::fromUtf8("pushButton_NextFragment"));
+        pushButton_NextFragment->setMinimumSize(QSize(30, 30));
+        pushButton_NextFragment->setMaximumSize(QSize(30, 30));
+
+        horizontalLayout->addWidget(pushButton_NextFragment);
+
         seekSlider = new Phonon::SeekSlider(dockWidgetContents);
         seekSlider->setObjectName(QString::fromUtf8("seekSlider"));
 
         horizontalLayout->addWidget(seekSlider);
+
+        horizontalLayout_3 = new QHBoxLayout();
+        horizontalLayout_3->setSpacing(1);
+        horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
+        horizontalLayout_3->setSizeConstraint(QLayout::SetFixedSize);
+        label_currentTime = new QLabel(dockWidgetContents);
+        label_currentTime->setObjectName(QString::fromUtf8("label_currentTime"));
+        QFont font;
+        font.setPointSize(9);
+        font.setItalic(true);
+        font.setStyleStrategy(QFont::PreferDefault);
+        label_currentTime->setFont(font);
+        label_currentTime->setTextFormat(Qt::RichText);
+
+        horizontalLayout_3->addWidget(label_currentTime);
+
+        label = new QLabel(dockWidgetContents);
+        label->setObjectName(QString::fromUtf8("label"));
+        label->setFont(font);
+        label->setTextFormat(Qt::RichText);
+
+        horizontalLayout_3->addWidget(label);
+
+        label_maxTime = new QLabel(dockWidgetContents);
+        label_maxTime->setObjectName(QString::fromUtf8("label_maxTime"));
+        label_maxTime->setFont(font);
+        label_maxTime->setTextFormat(Qt::RichText);
+
+        horizontalLayout_3->addWidget(label_maxTime);
+
+
+        horizontalLayout->addLayout(horizontalLayout_3);
 
         volumeSlider = new Phonon::VolumeSlider(dockWidgetContents);
         volumeSlider->setObjectName(QString::fromUtf8("volumeSlider"));
@@ -171,17 +249,25 @@ public:
 
         horizontalLayout->addWidget(volumeSlider);
 
+        pushButton_FullScreen = new QPushButton(dockWidgetContents);
+        pushButton_FullScreen->setObjectName(QString::fromUtf8("pushButton_FullScreen"));
+        pushButton_FullScreen->setMinimumSize(QSize(30, 30));
+        pushButton_FullScreen->setMaximumSize(QSize(30, 30));
+
+        horizontalLayout->addWidget(pushButton_FullScreen);
+
 
         verticalLayout_2->addLayout(horizontalLayout);
 
+        verticalLayout_2->setStretch(0, 1);
         DWVideo->setWidget(dockWidgetContents);
 
-        verticalLayout->addWidget(DWVideo);
+        verticalLayout_5->addWidget(DWVideo);
 
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QString::fromUtf8("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 752, 20));
+        menuBar->setGeometry(QRect(0, 0, 847, 20));
         menu = new QMenu(menuBar);
         menu->setObjectName(QString::fromUtf8("menu"));
         menuSettings = new QMenu(menuBar);
@@ -194,9 +280,10 @@ public:
         dockWidgetContents_2 = new QWidget();
         dockWidgetContents_2->setObjectName(QString::fromUtf8("dockWidgetContents_2"));
         verticalLayout_3 = new QVBoxLayout(dockWidgetContents_2);
-        verticalLayout_3->setSpacing(6);
+        verticalLayout_3->setSpacing(4);
         verticalLayout_3->setContentsMargins(11, 11, 11, 11);
         verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
+        verticalLayout_3->setContentsMargins(4, 4, 4, 4);
         tabWidget = new QTabWidget(dockWidgetContents_2);
         tabWidget->setObjectName(QString::fromUtf8("tabWidget"));
         tabWidget->setTabPosition(QTabWidget::West);
@@ -218,6 +305,7 @@ public:
 
         pushButton_Find = new QPushButton(dockWidgetContents_2);
         pushButton_Find->setObjectName(QString::fromUtf8("pushButton_Find"));
+        pushButton_Find->setAutoDefault(true);
 
         horizontalLayout_2->addWidget(pushButton_Find);
 
@@ -228,6 +316,7 @@ public:
 
         verticalLayout_3->addLayout(horizontalLayout_2);
 
+        verticalLayout_3->setStretch(0, 1);
         DWQuery->setWidget(dockWidgetContents_2);
         MainWindow->addDockWidget(static_cast<Qt::DockWidgetArea>(1), DWQuery);
         DWResult = new DockWidget(MainWindow);
@@ -240,7 +329,7 @@ public:
         verticalLayout_4->setSpacing(6);
         verticalLayout_4->setContentsMargins(11, 11, 11, 11);
         verticalLayout_4->setObjectName(QString::fromUtf8("verticalLayout_4"));
-        verticalLayout_4->setContentsMargins(3, 3, 3, 3);
+        verticalLayout_4->setContentsMargins(4, 4, 4, 4);
         tableView = new QTableView(dockWidgetContents_3);
         tableView->setObjectName(QString::fromUtf8("tableView"));
 
@@ -254,6 +343,21 @@ public:
         DWEvent->setAllowedAreas(Qt::RightDockWidgetArea);
         dockWidgetContents_5 = new QWidget();
         dockWidgetContents_5->setObjectName(QString::fromUtf8("dockWidgetContents_5"));
+        verticalLayout_6 = new QVBoxLayout(dockWidgetContents_5);
+        verticalLayout_6->setSpacing(4);
+        verticalLayout_6->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_6->setObjectName(QString::fromUtf8("verticalLayout_6"));
+        verticalLayout_6->setContentsMargins(4, 4, 4, 4);
+        tableView_Events = new QTableView(dockWidgetContents_5);
+        tableView_Events->setObjectName(QString::fromUtf8("tableView_Events"));
+
+        verticalLayout_6->addWidget(tableView_Events);
+
+        listView_Events = new QListView(dockWidgetContents_5);
+        listView_Events->setObjectName(QString::fromUtf8("listView_Events"));
+
+        verticalLayout_6->addWidget(listView_Events);
+
         DWEvent->setWidget(dockWidgetContents_5);
         MainWindow->addDockWidget(static_cast<Qt::DockWidgetArea>(2), DWEvent);
 
@@ -273,8 +377,14 @@ public:
     {
         MainWindow->setWindowTitle(QApplication::translate("MainWindow", "ArtixVideo", 0, QApplication::UnicodeUTF8));
         actionHttp->setText(QApplication::translate("MainWindow", "Http", 0, QApplication::UnicodeUTF8));
+        pushButton_PreviewFragment->setText(QApplication::translate("MainWindow", "|<", 0, QApplication::UnicodeUTF8));
         pushButton_Play->setText(QString());
         pushButton_Pause->setText(QString());
+        pushButton_NextFragment->setText(QApplication::translate("MainWindow", ">|", 0, QApplication::UnicodeUTF8));
+        label_currentTime->setText(QApplication::translate("MainWindow", "00:00:00", 0, QApplication::UnicodeUTF8));
+        label->setText(QApplication::translate("MainWindow", "|", 0, QApplication::UnicodeUTF8));
+        label_maxTime->setText(QApplication::translate("MainWindow", "00:00:00", 0, QApplication::UnicodeUTF8));
+        pushButton_FullScreen->setText(QApplication::translate("MainWindow", "full", 0, QApplication::UnicodeUTF8));
         menu->setTitle(QApplication::translate("MainWindow", "\320\244\320\260\320\271\320\273", 0, QApplication::UnicodeUTF8));
         menuSettings->setTitle(QApplication::translate("MainWindow", "Settings", 0, QApplication::UnicodeUTF8));
         DWQuery->setWindowTitle(QApplication::translate("MainWindow", "Query", 0, QApplication::UnicodeUTF8));
