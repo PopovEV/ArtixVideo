@@ -25,7 +25,9 @@ SOURCES += main.cpp\
     widgetsfactory.cpp \
     mainwindowmemento.cpp \
     videomanager.cpp \
-    config.cpp
+    config.cpp \
+    subtitlesmanager.cpp \
+    listview.cpp
 
 HEADERS  += mainwindow.h \
     sql.h \
@@ -40,7 +42,9 @@ HEADERS  += mainwindow.h \
     mainwindowmemento.h \
     global.h \
     videomanager.h \
-    config.h
+    config.h \
+    subtitlesmanager.h \
+    listview.h
 
 FORMS    += mainwindow.ui
 

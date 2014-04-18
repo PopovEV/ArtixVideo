@@ -4,13 +4,29 @@
 
 #include "sql.h"
 
+SQL *SQL::instance = NULL;
+
 SQL::SQL(QObject *parent) :
     QObject(parent)
 {
 
 }
 
-bool SQL::createConnection()
+SQL *SQL::getInstance()
+{
+    if(!instance)
+        instance = new SQL();
+    return instance;
+}
+
+QSqlDatabase SQL::getConnection()
+{
+    if(!db.isOpen() || !db.isValid())
+        instance->openConnection();
+    return db;
+}
+
+bool SQL::openConnection()
 {
     db = QSqlDatabase::addDatabase("QMYSQL", "mydb");
     db.setDatabaseName("artixvideo");
@@ -51,7 +67,7 @@ QSqlQueryModel *SQL::queryExec()
 
 bool SQL::sqlPrepare(const QString &query)
 {
-    sqlquery = QSqlQuery(db);
+    sqlquery = QSqlQuery(getConnection());
     return sqlquery.prepare(query);
 }
 

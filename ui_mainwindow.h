@@ -16,7 +16,6 @@
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QHeaderView>
 #include <QtGui/QLabel>
-#include <QtGui/QListView>
 #include <QtGui/QMainWindow>
 #include <QtGui/QMenu>
 #include <QtGui/QMenuBar>
@@ -31,6 +30,7 @@
 #include <phonon/videoplayer.h>
 #include <phonon/volumeslider.h>
 #include "dockwidget.h"
+#include "listview.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -78,8 +78,7 @@ public:
     DockWidget *DWEvent;
     QWidget *dockWidgetContents_5;
     QVBoxLayout *verticalLayout_6;
-    QTableView *tableView_Events;
-    QListView *listView_Events;
+    ListView *listView_Events;
 
     void setupUi(QMainWindow *MainWindow)
     {
@@ -124,11 +123,8 @@ public:
         actionHttp->setObjectName(QString::fromUtf8("actionHttp"));
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
-        QSizePolicy sizePolicy1(QSizePolicy::Maximum, QSizePolicy::Maximum);
-        sizePolicy1.setHorizontalStretch(0);
-        sizePolicy1.setVerticalStretch(0);
-        sizePolicy1.setHeightForWidth(centralWidget->sizePolicy().hasHeightForWidth());
-        centralWidget->setSizePolicy(sizePolicy1);
+        sizePolicy.setHeightForWidth(centralWidget->sizePolicy().hasHeightForWidth());
+        centralWidget->setSizePolicy(sizePolicy);
         verticalLayout_5 = new QVBoxLayout(centralWidget);
         verticalLayout_5->setSpacing(0);
         verticalLayout_5->setContentsMargins(11, 11, 11, 11);
@@ -216,6 +212,7 @@ public:
         horizontalLayout_3->setSizeConstraint(QLayout::SetFixedSize);
         label_currentTime = new QLabel(dockWidgetContents);
         label_currentTime->setObjectName(QString::fromUtf8("label_currentTime"));
+        label_currentTime->setMinimumSize(QSize(55, 0));
         QFont font;
         font.setPointSize(9);
         font.setItalic(true);
@@ -234,6 +231,7 @@ public:
 
         label_maxTime = new QLabel(dockWidgetContents);
         label_maxTime->setObjectName(QString::fromUtf8("label_maxTime"));
+        label_maxTime->setMinimumSize(QSize(55, 0));
         label_maxTime->setFont(font);
         label_maxTime->setTextFormat(Qt::RichText);
 
@@ -348,13 +346,17 @@ public:
         verticalLayout_6->setContentsMargins(11, 11, 11, 11);
         verticalLayout_6->setObjectName(QString::fromUtf8("verticalLayout_6"));
         verticalLayout_6->setContentsMargins(4, 4, 4, 4);
-        tableView_Events = new QTableView(dockWidgetContents_5);
-        tableView_Events->setObjectName(QString::fromUtf8("tableView_Events"));
-
-        verticalLayout_6->addWidget(tableView_Events);
-
-        listView_Events = new QListView(dockWidgetContents_5);
+        listView_Events = new ListView(dockWidgetContents_5);
         listView_Events->setObjectName(QString::fromUtf8("listView_Events"));
+        listView_Events->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        listView_Events->setSelectionMode(QAbstractItemView::MultiSelection);
+        listView_Events->setSelectionBehavior(QAbstractItemView::SelectRows);
+        listView_Events->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+        listView_Events->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+        listView_Events->setResizeMode(QListView::Adjust);
+        listView_Events->setLayoutMode(QListView::Batched);
+        listView_Events->setSpacing(2);
+        listView_Events->setWordWrap(true);
 
         verticalLayout_6->addWidget(listView_Events);
 

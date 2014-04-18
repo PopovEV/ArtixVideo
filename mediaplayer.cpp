@@ -1,6 +1,7 @@
 #include "mediaplayer.h"
-#include <QLabel>
-#include <QTime>
+#include "videomanager.h"
+#include "subtitlesmanager.h"
+#include "config.h"
 
 MediaPlayer::MediaPlayer(VideoPlayer *videoPlayer, SeekSlider *seekSlider, VolumeSlider *volumeSlider,
                          QObject *parent) : QObject(parent)
@@ -13,9 +14,6 @@ MediaPlayer::MediaPlayer(VideoPlayer *videoPlayer, SeekSlider *seekSlider, Volum
     seekSlider->setMediaObject(mediaObject);
     volumeSlider->setAudioOutput(videoPlayer->audioOutput());
 
-    startTime = new QTime();
-    selectedTime = new QTime();
-
     mediaObject->setTickInterval(1000);
     connect(mediaObject, SIGNAL(stateChanged(Phonon::State,Phonon::State)),
             this, SLOT(stateChanged(Phonon::State,Phonon::State)));
@@ -27,13 +25,15 @@ MediaPlayer::~MediaPlayer()
 
 }
 
-void MediaPlayer::playVideo(const QString &path, const QTime &startTime, const QTime &selectedTime)
+void MediaPlayer::playVideo(const QString &path, const QDateTime &startDateTime,
+                            const QDateTime &selectedDateTime)
 {
     if (!path.isEmpty()) {
-        this->startTime->setHMS(startTime.hour(), startTime.minute(), startTime.second());
-        this->selectedTime->setHMS(selectedTime.hour(), selectedTime.minute(), selectedTime.second());
-        timeDifference = startTime.msecsTo(selectedTime);
+        this->startDateTime = startDateTime;
+        this->selectedDateTime = selectedDateTime;
+        timeDifference = startDateTime.time().msecsTo(selectedDateTime.time());
         videoPlayer->load(MediaSource(path));
+        loadSubtitles(startDateTime);
         videoPlayer->play();
     }
 }
@@ -54,7 +54,7 @@ void MediaPlayer::stateChanged(State newstate, State oldstate)
         qint64 totalTimeInMsec = mediaObject->totalTime();
 //        QTime totalTime(totalTimeInMsec / (1000 * 60 * 60) % 60, totalTimeInMsec / (1000 * 60) % 60,
 //                        totalTimeInMsec / (1000) % 60);
-        QTime totalTime = startTime->addMSecs(totalTimeInMsec);
+        QTime totalTime = startDateTime.time().addMSecs(totalTimeInMsec);
         maxTimeLabel->setText(totalTime.toString("hh:mm:ss"));
     }
 }
@@ -64,8 +64,46 @@ void MediaPlayer::setCurrentTime()
     qint64 currentTimeMsec = mediaObject->currentTime();
 //    QTime totalTime(currentTime / (1000 * 60 * 60) % 60, currentTime / (1000 * 60) % 60,
 //                    currentTime / (1000) % 60);
-    QTime currentTime = startTime->addMSecs(currentTimeMsec);
-    currentTimeLabel->setText(currentTime.toString("hh:mm:ss"));
+    QDateTime currentTime = startDateTime.addMSecs(currentTimeMsec);
+    currentTimeLabel->setText(currentTime.time().toString("hh:mm:ss"));
+
+    //change subtitles
+    SubtitlesManager::getInstance()->changePosition(currentTime.toString("yyyy-MM-dd hh:mm:ss"));
+}
+
+void MediaPlayer::playNextVideo()
+{
+    QPair<QString, QDateTime> nextVideo = VideoManager::getInstance()->getNextVideo(startDateTime);
+    if (nextVideo.first.isEmpty()) {
+        return;
+    }
+
+    timeDifference = 0;
+    startDateTime = nextVideo.second;
+    videoPlayer->load(MediaSource(nextVideo.first));
+    loadSubtitles(startDateTime);
+    videoPlayer->play();
+}
+
+void MediaPlayer::playPreviousVideo()
+{
+    QPair<QString, QDateTime> nextVideo = VideoManager::getInstance()->getPreviousVideo(startDateTime);
+    if (nextVideo.first.isEmpty()) {
+        return;
+    }
+
+    timeDifference = 0;
+    startDateTime = nextVideo.second;
+    videoPlayer->load(MediaSource(nextVideo.first));
+    loadSubtitles(startDateTime);
+    videoPlayer->play();
+}
+
+void MediaPlayer::loadSubtitles(const QDateTime &startTime)
+{
+    int lenghtVideo = Config::getInstance()->getOption("LenghtVideo", 300).toInt();
+    QDateTime endDateTime(startTime.addSecs(lenghtVideo));
+    SubtitlesManager::getInstance()->loadSubtitles(&startTime, &endDateTime);
 }
 
 QLabel *MediaPlayer::getCurrentTimeLabel() const

@@ -1,5 +1,7 @@
 #include "videomanager.h"
 
+#include "config.h"
+
 #include <QDebug>
 #include <QUrl>
 #include <QMessageBox>
@@ -26,17 +28,37 @@ VideoManager *VideoManager::getInstance()
     return instance;
 }
 
-QPair<QString, QTime> VideoManager::getVideo(QDateTime &selectedDateTime)
+QPair<QString, QDateTime> VideoManager::getVideo(QDateTime &selectedDateTime)
+{
+    return search(selectedDateTime, Current);
+}
+
+QPair<QString, QDateTime> VideoManager::getNextVideo(QDateTime &startVideoDateTime)
+{
+    return search(startVideoDateTime, Next);
+}
+
+QPair<QString, QDateTime> VideoManager::getPreviousVideo(QDateTime &startVideoDateTime)
+{
+    return search(startVideoDateTime, Previous);
+}
+
+QPair<QString, QDateTime> VideoManager::search(QDateTime &selectedDateTime,
+                                           VideoManager::TypeRequestedVideo typeRequestedVideo)
 {
     QString date = selectedDateTime.date().toString("yyyyMMdd");
 
-    QPair<QString, QTime> video;
+    QPair<QString, QDateTime> video;
     if(cache.contains(selectedDateTime.date())) {
         qDebug() << "In cache" << selectedDateTime;
         QList<QTime> videoFiles = cache.value(selectedDateTime.date());
         qDebug() << videoFiles;
         QPair<QString, QTime> fileNameAndStartTime = searchSuitableFileName(videoFiles,
-                                                                            selectedDateTime.time());
+                                                                            selectedDateTime.time(),
+                                                                            typeRequestedVideo);
+        if (fileNameAndStartTime.first.isEmpty()) {
+            return video;
+        }
 
         QDir dir(QDir::currentPath());
         dir.cd("download");
@@ -45,11 +67,11 @@ QPair<QString, QTime> VideoManager::getVideo(QDateTime &selectedDateTime)
 
         if(QFile::exists(absoluteFilePath)) {
             video.first = absoluteFilePath;
-            video.second = fileNameAndStartTime.second;
+            video.second = QDateTime(selectedDateTime.date(), fileNameAndStartTime.second);
         } else {
             QUrl videoFileUrl("http://localhost/artixvideo/" + date + "/" + fileNameAndStartTime.first);
             video.first = downloadFile(videoFileUrl, date);
-            video.second = fileNameAndStartTime.second;
+            video.second = QDateTime(selectedDateTime.date(), fileNameAndStartTime.second);
         }
 
     } else {
@@ -75,27 +97,18 @@ QPair<QString, QTime> VideoManager::getVideo(QDateTime &selectedDateTime)
         }
 
         QPair<QString, QTime> fileNameAndStartTime = searchSuitableFileName(timeStartVideo,
-                                                                            selectedDateTime.time());
+                                                                            selectedDateTime.time(),
+                                                                            typeRequestedVideo);
         if(fileNameAndStartTime.first.isEmpty()) {
             return video;
         }
 
         QUrl videoFileUrl("http://localhost/artixvideo/" + date + "/" + fileNameAndStartTime.first);
         video.first = downloadFile(videoFileUrl, date);
-        video.second = fileNameAndStartTime.second;
+        video.second = QDateTime(selectedDateTime.date(), fileNameAndStartTime.second);
     }
 
     return video;
-}
-
-QString VideoManager::getNextVideo(QDateTime &startVideoDateTime)
-{
-    return QString();
-}
-
-QString VideoManager::getForwardVideo(QDateTime &startVideoDateTime)
-{
-    return QString();
 }
 
 QString VideoManager::downloadFile(QUrl &url, QString &folderName)
@@ -161,16 +174,30 @@ QStringList VideoManager::getVideoFileNames(QString indexFileName)
 }
 
 QPair<QString, QTime> VideoManager::searchSuitableFileName(const QList<QTime> &timeStartVideo,
-                                                           QTime selectedTime)
+                                                           QTime selectedTime,
+                                                           VideoManager::TypeRequestedVideo typeRequestedVideo)
 {
-    QTime suitableTime;
-    foreach (QTime time, timeStartVideo) {
-        //TODO: Replace 300 sec by get option "VideoLenght" from config.ini
-        if(selectedTime >= time && selectedTime < time.addSecs(300)) {
-            suitableTime = time;
-            break;
-        }
+    QTime suitableTime ,tempTime, nextTime, previousTime;
+    int lenghtVideo = Config::getInstance()->getOption("LenghtVideo", 300).toInt();
+
+    switch (typeRequestedVideo) {
+    case Current:
+        suitableTime = searchVideoByTime(timeStartVideo, selectedTime);
+        break;
+    case Next:
+        tempTime = searchVideoByTime(timeStartVideo, selectedTime);
+        nextTime = tempTime.addSecs(lenghtVideo + (lenghtVideo / 2));
+        suitableTime = searchVideoByTime(timeStartVideo, nextTime);
+        break;
+    case Previous:
+        tempTime = searchVideoByTime(timeStartVideo, selectedTime);
+        previousTime = tempTime.addSecs(-(lenghtVideo / 2));
+        suitableTime = searchVideoByTime(timeStartVideo, previousTime);
+        break;
+    default:
+        break;
     }
+
 
     if(suitableTime.isNull()) {
         QMessageBox::information(0, "Поиск видеофайла",
@@ -179,6 +206,20 @@ QPair<QString, QTime> VideoManager::searchSuitableFileName(const QList<QTime> &t
     }
 
     return QPair<QString, QTime> (suitableTime.toString("hhmmss") + "-INJ.flv", suitableTime);
+}
+
+QTime VideoManager::searchVideoByTime(const QList<QTime> &timeStartVideo, QTime &selectedTime)
+{
+    QTime suitableTime;
+    foreach (QTime time, timeStartVideo) {
+        //TODO: Replace 300 sec by get option "VideoLenght" from config.ini
+        int lenghtVideo = Config::getInstance()->getOption("LenghtVideo", 300).toInt();
+        if(selectedTime >= time && selectedTime < time.addSecs(lenghtVideo)) {
+            suitableTime = time;
+            break;
+        }
+    }
+    return suitableTime;
 }
 
 QList<QTime> VideoManager::convertStringToTime(const QStringList &videoFileNames)

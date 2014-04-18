@@ -10,6 +10,13 @@
 class VideoManager : public QObject
 {
     Q_OBJECT
+private:
+    enum TypeRequestedVideo {
+        Current,
+        Next,
+        Previous
+    };
+
 public:
     static VideoManager *getInstance();
 
@@ -18,19 +25,19 @@ public:
      * @param selectedDateTime - data i vremya fayla, kotoriy nugno nayti
      * @return Path to video file in download dir (absolute file path)
      */
-    QPair<QString, QTime> getVideo(QDateTime &selectedDateTime);
+    QPair<QString, QDateTime> getVideo(QDateTime &selectedDateTime);
     /**
      * @brief getNextVideo
      * @param startVideoDateTime - vremya nachala video fayla i data
      * @return Path to video file in download dir (absolute file path)
      */
-    QString getNextVideo(QDateTime &startVideoDateTime);
+    QPair<QString, QDateTime> getNextVideo(QDateTime &startVideoDateTime);
     /**
      * @brief getForwardVideo
      * @param startVideoDateTime - vremya nachala video fayla i data
      * @return Path to video file in download dir (absolute file path)
      */
-    QString getForwardVideo(QDateTime &startVideoDateTime);
+    QPair<QString, QDateTime> getPreviousVideo(QDateTime &startVideoDateTime);
 
 private:
     explicit VideoManager(QObject *parent = 0);
@@ -38,12 +45,15 @@ private:
     static VideoManager *instance;
     static HttpDownload *httpDownload;
 
+    QPair<QString, QDateTime> search(QDateTime &selectedDateTime,
+                                 TypeRequestedVideo typeRequestedVideo);
     QString downloadFile(QUrl &url, QString &folderName);
     bool downloadIndexFile(QDateTime &selectedTime);
     QStringList getVideoFileNames(QString indexFileName);
     QPair<QString, QTime> searchSuitableFileName(const QList<QTime> &timeStartVideo,
-                                                 QTime selectedTime);
-
+                                                 QTime selectedTime,
+                                                 TypeRequestedVideo typeRequestedVideo);
+    QTime searchVideoByTime(const QList<QTime> &timeStartVideo, QTime &selectedTime);
     QList<QTime> convertStringToTime(const QStringList &videoFileNames);
 
     QMap<QDate, QList<QTime> > cache;

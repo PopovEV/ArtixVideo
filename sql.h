@@ -9,9 +9,9 @@ class SQL : public QObject
 {
     Q_OBJECT
 public:
-    explicit SQL(QObject *parent = 0);
 
-    bool createConnection();
+    static SQL *getInstance();
+    QSqlDatabase getConnection();
 
     QSqlQueryModel *queryExec();
     bool sqlPrepare(const QString &query);
@@ -19,6 +19,10 @@ public:
     QSqlQueryModel *getSqlModel();
     
 private:
+    explicit SQL(QObject *parent = 0);
+    bool openConnection();
+
+    static SQL *instance;
     QSqlDatabase db;
     QSqlQueryModel *sqlmodel;
     QSqlQuery sqlquery;

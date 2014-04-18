@@ -15,12 +15,8 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     a.setApplicationName("ArtixVideo");
 
-    SQL *sqlDB = new SQL();
     MainWindow* w = new MainWindow();
     //    w->setAttribute(Qt::WA_AlwaysShowToolTips, true);
-    w->setSQL(sqlDB);
-
-    sqlDB->createConnection();
     w->showMaximized();
 
     return a.exec();

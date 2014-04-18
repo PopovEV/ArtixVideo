@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QEventLoop>
 #include "videomanager.h"
+#include "subtitlesmanager.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -37,6 +38,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->videoPlayer->mediaObject(), SIGNAL(bufferStatus(int)),
             ui->progressBar_BufferingVideo, SLOT(setValue(int)));
     connect(ui->pushButton_FullScreen, SIGNAL(clicked()), ui->videoPlayer->videoWidget(), SLOT(enterFullScreen()));
+    connect(ui->pushButton_NextFragment, SIGNAL(clicked()), mediaPlayer, SLOT(playNextVideo()));
+    connect(ui->pushButton_PreviewFragment, SIGNAL(clicked()), mediaPlayer, SLOT(playPreviousVideo()));
+
+    SubtitlesManager::getInstance()->setListView(ui->listView_Events);
 
     // Восстанавливаем вид главного окна
     MainWindowMemento *memento = createMemento();
@@ -120,15 +125,11 @@ int MainWindow::addTabQueries(QString name)
     return index;
 }
 
-void MainWindow::setSQL(SQL *p)
-{
-    pSQL = p;
-}
-
 void MainWindow::getDateTimeFromCurrentRow(QModelIndex ModelIndex)
 {
     int currentRow = ModelIndex.row();
 
+    SQL *pSQL = SQL::getInstance();
     QSqlQueryModel *pSqlModel = pSQL->getSqlModel();
     qint32 columnCount = pSqlModel->columnCount();
 
@@ -140,12 +141,12 @@ void MainWindow::getDateTimeFromCurrentRow(QModelIndex ModelIndex)
             QModelIndex newModelIndex = pSqlModel->index(currentRow, i, QModelIndex());
             QDateTime selectedDateTime = pSqlModel->data(newModelIndex, Qt::DisplayRole).toDateTime();
             //downloadFile(selectedTime);
-            QPair<QString, QTime> videoFilePathAndStartTime =
+            QPair<QString, QDateTime> videoFilePathAndStartTime =
                     VideoManager::getInstance()->getVideo(selectedDateTime);
             qDebug() << videoFilePathAndStartTime.first;
             qDebug() << videoFilePathAndStartTime.second;
             mediaPlayer->playVideo(videoFilePathAndStartTime.first, videoFilePathAndStartTime.second,
-                                   selectedDateTime.time());
+                                   selectedDateTime);
             return;
         }
     }
@@ -257,6 +258,7 @@ void MainWindow::clickedFind()
     int queryIndex = comboBox->itemData(comboBox->currentIndex(), Qt::UserRole).toInt();
     Query currentQuery = queryList->value(queryIndex);
 
+    SQL *pSQL = SQL::getInstance();
     if (!pSQL->sqlPrepare(currentQuery.sql)) {
         QMessageBox::information(0, "Error", "Error prepare query\n" + currentQuery.sql);
         return;
@@ -349,5 +351,5 @@ void MainWindow::closeEvent(QCloseEvent *pe)
     // Clear download folder
     QDir dir(QDir::currentPath());
     dir.cd("download");
-    removeDir(dir.path());
+    //removeDir(dir.path());
 }

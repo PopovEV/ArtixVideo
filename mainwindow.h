@@ -35,8 +35,6 @@ public:
     void setMemento(MainWindowMemento *memento);
     MainWindowMemento *createMemento();
 
-    void setSQL(SQL *p);
-
     Ui::MainWindow *ui;
 
     /* Элементы интерфейса формы */
@@ -49,7 +47,6 @@ public:
     QPushButton *pPBExecQuery;      // кнопка выполнения выбранного запроса
 
 private:
-    SQL *pSQL;
     MediaPlayer *mediaPlayer;
 
     QList<QComboBox *> comboBoxQueryList;        // указатели на комбобоксы, соответствующие каждой вкладке
