@@ -16,22 +16,6 @@ using namespace Phonon;
 class MediaPlayer : public QObject
 {
     Q_OBJECT
-private:
-    VideoPlayer *videoPlayer;
-    MediaObject *mediaObject;
-    SeekSlider *seekSlider;
-    VolumeSlider *volumeSlider;
-    QLabel *currentTimeLabel;
-    QLabel *maxTimeLabel;
-
-    qint64 timeDifference;
-
-    QDateTime startDateTime; //vremya nachala rolika
-    QDateTime selectedDateTime; //vremya operacii iz rezultata poiska
-
-//    void playVideo();
-    void loadSubtitles(const QDateTime &startTime);
-
 public:
     explicit MediaPlayer(VideoPlayer *videoPlayer, SeekSlider *seekSlider, VolumeSlider *volumeSlider,
                          QObject *parent = 0);
@@ -43,6 +27,30 @@ public:
 
     QLabel *getMaxTimeLabel() const;
     void setMaxTimeLabel(QLabel *value);
+
+private:
+    VideoPlayer *videoPlayer;
+    MediaObject *mediaObject;
+    SeekSlider *seekSlider;
+    VolumeSlider *volumeSlider;
+    QLabel *currentTimeLabel;
+    QLabel *maxTimeLabel;
+
+    /**
+     * @brief differenceTime Разница времени между началом ролика и выбранным событием (msec)
+     */
+    qint64 differenceTime;
+
+    /**
+    * @brief startDateTime Время начала ролика
+    */
+    QDateTime startDateTime;
+    /**
+     * @brief selectedDateTime Время события из результатов поиска
+     */
+    QDateTime selectedDateTime;
+
+    void loadSubtitles(const QDateTime &startTime);
 
 signals:
     

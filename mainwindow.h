@@ -41,7 +41,7 @@ public:
     DockWidget *pDWQueries;
     DockWidget *pDWVideo;
     DockWidget *pDWResult;
-    DockWidget *pDWEvent;
+    DockWidget *pDWSubtitles;
 
     QTabWidget *pTWQueries;
     QPushButton *pPBExecQuery;      // кнопка выполнения выбранного запроса
@@ -68,7 +68,6 @@ public slots:
     int isTabExist(QString tabName);    // существует ли уже такая вкладка?   -1 - не существует
     int addTabQueries(QString TabName);        // добавление вкладки в TabWidget с названием категории запроса
     void addQueryName(QString name, int indexTab, int numQueryInList);  // добавление названия запроса в ComboBox нужной вкладки
-    void movedHorisontalSplitter(int pos, int index);
     void getDateTimeFromCurrentRow(QModelIndex ModelIndex);
 
     void loadQueries();
@@ -76,9 +75,9 @@ public slots:
 
     void activateQuery(int index);
     void tabChanged(int tabIndex);
+    void connectionCliched();
 
 protected:
-    virtual void resizeEvent(QResizeEvent *pe);
     virtual void closeEvent(QCloseEvent *pe);
 };
 

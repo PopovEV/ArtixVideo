@@ -19,7 +19,6 @@
 #include <QtGui/QMainWindow>
 #include <QtGui/QMenu>
 #include <QtGui/QMenuBar>
-#include <QtGui/QProgressBar>
 #include <QtGui/QPushButton>
 #include <QtGui/QSpacerItem>
 #include <QtGui/QTabWidget>
@@ -38,6 +37,8 @@ class Ui_MainWindow
 {
 public:
     QAction *actionHttp;
+    QAction *action_Connection;
+    QAction *action_Exit;
     QWidget *centralWidget;
     QVBoxLayout *verticalLayout_5;
     DockWidget *DWVideo;
@@ -45,7 +46,6 @@ public:
     QVBoxLayout *verticalLayout_2;
     QVBoxLayout *verticalLayout;
     Phonon::VideoPlayer *videoPlayer;
-    QProgressBar *progressBar_BufferingVideo;
     QHBoxLayout *horizontalLayout;
     QPushButton *pushButton_PreviewFragment;
     QPushButton *pushButton_Play;
@@ -75,29 +75,26 @@ public:
     QWidget *dockWidgetContents_3;
     QVBoxLayout *verticalLayout_4;
     QTableView *tableView;
-    DockWidget *DWEvent;
+    DockWidget *DWSubtitles;
     QWidget *dockWidgetContents_5;
     QVBoxLayout *verticalLayout_6;
-    ListView *listView_Events;
+    ListView *listView_Subtitles;
 
     void setupUi(QMainWindow *MainWindow)
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
-        MainWindow->resize(847, 564);
+        MainWindow->resize(1110, 800);
         QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(MainWindow->sizePolicy().hasHeightForWidth());
         MainWindow->setSizePolicy(sizePolicy);
-        MainWindow->setBaseSize(QSize(0, 0));
         MainWindow->setStyleSheet(QString::fromUtf8("QMainWindow::separator::vertical {\n"
 "     background :qlineargradient(spread:pad, x1:0.993909, y1:0.455, x2:0, y2:0.511, stop:0 rgba(172, 172, 172, 255), stop:1 rgba(255, 255, 255, 255));\n"
 "     width: 5px; /* when vertical */\n"
 "     height: 5px; /* when horizontal */\n"
-" \n"
 "     border-radius: 2px;\n"
-" \n"
 " }\n"
 " \n"
 " QMainWindow::separator:hover::vertical {\n"
@@ -108,30 +105,37 @@ public:
 "     background :qlineargradient(spread:pad, x1:0.494, y1:1, x2:0.483, y2:0.0166818, stop:0 rgba(172, 172, 172, 255), stop:1 rgba(255, 255, 255, 255));\n"
 "     width: 5px; /* when vertical */\n"
 "     height: 5px; /* when horizontal */\n"
-" \n"
 "     border-radius: 2px;\n"
 " \n"
 " }\n"
 " \n"
 " QMainWindow::separator:hover::horizontal{\n"
-"     background:qlineargradient(spread:pad, x1:0.5, y1:0.017, x2:0.5, y2:1, stop:0 rgba(102, 102, 102, 255), st"
-                        "op:1 rgba(255, 255, 255, 255));\n"
+"     background:qlineargradient(spread:pad, x1:0.5, y1:0.017, x2:0.5, y2:1, stop:0 rgba(102, 102, 102, 255), stop:1 rgba(255, 255"
+                        ", 255, 255));\n"
 " }"));
         MainWindow->setTabShape(QTabWidget::Rounded);
         MainWindow->setDockOptions(QMainWindow::AnimatedDocks);
         actionHttp = new QAction(MainWindow);
         actionHttp->setObjectName(QString::fromUtf8("actionHttp"));
+        action_Connection = new QAction(MainWindow);
+        action_Connection->setObjectName(QString::fromUtf8("action_Connection"));
+        action_Exit = new QAction(MainWindow);
+        action_Exit->setObjectName(QString::fromUtf8("action_Exit"));
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
-        sizePolicy.setHeightForWidth(centralWidget->sizePolicy().hasHeightForWidth());
-        centralWidget->setSizePolicy(sizePolicy);
+        centralWidget->setBaseSize(QSize(400, 300));
         verticalLayout_5 = new QVBoxLayout(centralWidget);
         verticalLayout_5->setSpacing(0);
-        verticalLayout_5->setContentsMargins(11, 11, 11, 11);
-        verticalLayout_5->setObjectName(QString::fromUtf8("verticalLayout_5"));
         verticalLayout_5->setContentsMargins(2, 2, 2, 2);
+        verticalLayout_5->setObjectName(QString::fromUtf8("verticalLayout_5"));
+        verticalLayout_5->setSizeConstraint(QLayout::SetDefaultConstraint);
         DWVideo = new DockWidget(centralWidget);
         DWVideo->setObjectName(QString::fromUtf8("DWVideo"));
+        QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(DWVideo->sizePolicy().hasHeightForWidth());
+        DWVideo->setSizePolicy(sizePolicy1);
         DWVideo->setFloating(false);
         DWVideo->setFeatures(QDockWidget::NoDockWidgetFeatures);
         DWVideo->setAllowedAreas(Qt::TopDockWidgetArea);
@@ -139,9 +143,8 @@ public:
         dockWidgetContents->setObjectName(QString::fromUtf8("dockWidgetContents"));
         verticalLayout_2 = new QVBoxLayout(dockWidgetContents);
         verticalLayout_2->setSpacing(3);
-        verticalLayout_2->setContentsMargins(11, 11, 11, 11);
-        verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
         verticalLayout_2->setContentsMargins(0, 0, 0, 0);
+        verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
         verticalLayout = new QVBoxLayout();
         verticalLayout->setSpacing(0);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
@@ -149,17 +152,6 @@ public:
         videoPlayer->setObjectName(QString::fromUtf8("videoPlayer"));
 
         verticalLayout->addWidget(videoPlayer);
-
-        progressBar_BufferingVideo = new QProgressBar(dockWidgetContents);
-        progressBar_BufferingVideo->setObjectName(QString::fromUtf8("progressBar_BufferingVideo"));
-        progressBar_BufferingVideo->setMinimumSize(QSize(0, 5));
-        progressBar_BufferingVideo->setMaximumSize(QSize(16777215, 5));
-        progressBar_BufferingVideo->setValue(24);
-        progressBar_BufferingVideo->setAlignment(Qt::AlignCenter);
-        progressBar_BufferingVideo->setTextVisible(false);
-        progressBar_BufferingVideo->setOrientation(Qt::Horizontal);
-
-        verticalLayout->addWidget(progressBar_BufferingVideo);
 
 
         verticalLayout_2->addLayout(verticalLayout);
@@ -243,7 +235,9 @@ public:
         volumeSlider = new Phonon::VolumeSlider(dockWidgetContents);
         volumeSlider->setObjectName(QString::fromUtf8("volumeSlider"));
         volumeSlider->setMaximumSize(QSize(150, 16777215));
-        volumeSlider->setProperty("muteVisible", QVariant(true));
+        volumeSlider->setOrientation(Qt::Vertical);
+        volumeSlider->setTracking(true);
+        volumeSlider->setMuteVisible(true);
 
         horizontalLayout->addWidget(volumeSlider);
 
@@ -265,7 +259,7 @@ public:
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QString::fromUtf8("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 847, 20));
+        menuBar->setGeometry(QRect(0, 0, 1110, 23));
         menu = new QMenu(menuBar);
         menu->setObjectName(QString::fromUtf8("menu"));
         menuSettings = new QMenu(menuBar);
@@ -273,15 +267,17 @@ public:
         MainWindow->setMenuBar(menuBar);
         DWQuery = new DockWidget(MainWindow);
         DWQuery->setObjectName(QString::fromUtf8("DWQuery"));
+        sizePolicy1.setHeightForWidth(DWQuery->sizePolicy().hasHeightForWidth());
+        DWQuery->setSizePolicy(sizePolicy1);
         DWQuery->setFeatures(QDockWidget::NoDockWidgetFeatures);
         DWQuery->setAllowedAreas(Qt::LeftDockWidgetArea);
         dockWidgetContents_2 = new QWidget();
         dockWidgetContents_2->setObjectName(QString::fromUtf8("dockWidgetContents_2"));
         verticalLayout_3 = new QVBoxLayout(dockWidgetContents_2);
         verticalLayout_3->setSpacing(4);
-        verticalLayout_3->setContentsMargins(11, 11, 11, 11);
-        verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
         verticalLayout_3->setContentsMargins(4, 4, 4, 4);
+        verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
+        verticalLayout_3->setSizeConstraint(QLayout::SetMaximumSize);
         tabWidget = new QTabWidget(dockWidgetContents_2);
         tabWidget->setObjectName(QString::fromUtf8("tabWidget"));
         tabWidget->setTabPosition(QTabWidget::West);
@@ -303,7 +299,9 @@ public:
 
         pushButton_Find = new QPushButton(dockWidgetContents_2);
         pushButton_Find->setObjectName(QString::fromUtf8("pushButton_Find"));
+        pushButton_Find->setMinimumSize(QSize(100, 0));
         pushButton_Find->setAutoDefault(true);
+        pushButton_Find->setDefault(true);
 
         horizontalLayout_2->addWidget(pushButton_Find);
 
@@ -325,46 +323,76 @@ public:
         dockWidgetContents_3->setObjectName(QString::fromUtf8("dockWidgetContents_3"));
         verticalLayout_4 = new QVBoxLayout(dockWidgetContents_3);
         verticalLayout_4->setSpacing(6);
-        verticalLayout_4->setContentsMargins(11, 11, 11, 11);
-        verticalLayout_4->setObjectName(QString::fromUtf8("verticalLayout_4"));
         verticalLayout_4->setContentsMargins(4, 4, 4, 4);
+        verticalLayout_4->setObjectName(QString::fromUtf8("verticalLayout_4"));
         tableView = new QTableView(dockWidgetContents_3);
         tableView->setObjectName(QString::fromUtf8("tableView"));
+        tableView->setSelectionMode(QAbstractItemView::SingleSelection);
+        tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+        tableView->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+        tableView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
 
         verticalLayout_4->addWidget(tableView);
 
         DWResult->setWidget(dockWidgetContents_3);
         MainWindow->addDockWidget(static_cast<Qt::DockWidgetArea>(8), DWResult);
-        DWEvent = new DockWidget(MainWindow);
-        DWEvent->setObjectName(QString::fromUtf8("DWEvent"));
-        DWEvent->setFeatures(QDockWidget::NoDockWidgetFeatures);
-        DWEvent->setAllowedAreas(Qt::RightDockWidgetArea);
+        DWSubtitles = new DockWidget(MainWindow);
+        DWSubtitles->setObjectName(QString::fromUtf8("DWSubtitles"));
+        sizePolicy1.setHeightForWidth(DWSubtitles->sizePolicy().hasHeightForWidth());
+        DWSubtitles->setSizePolicy(sizePolicy1);
+        DWSubtitles->setFeatures(QDockWidget::NoDockWidgetFeatures);
+        DWSubtitles->setAllowedAreas(Qt::RightDockWidgetArea);
         dockWidgetContents_5 = new QWidget();
         dockWidgetContents_5->setObjectName(QString::fromUtf8("dockWidgetContents_5"));
         verticalLayout_6 = new QVBoxLayout(dockWidgetContents_5);
         verticalLayout_6->setSpacing(4);
-        verticalLayout_6->setContentsMargins(11, 11, 11, 11);
-        verticalLayout_6->setObjectName(QString::fromUtf8("verticalLayout_6"));
         verticalLayout_6->setContentsMargins(4, 4, 4, 4);
-        listView_Events = new ListView(dockWidgetContents_5);
-        listView_Events->setObjectName(QString::fromUtf8("listView_Events"));
-        listView_Events->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        listView_Events->setSelectionMode(QAbstractItemView::MultiSelection);
-        listView_Events->setSelectionBehavior(QAbstractItemView::SelectRows);
-        listView_Events->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
-        listView_Events->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
-        listView_Events->setResizeMode(QListView::Adjust);
-        listView_Events->setLayoutMode(QListView::Batched);
-        listView_Events->setSpacing(2);
-        listView_Events->setWordWrap(true);
+        verticalLayout_6->setObjectName(QString::fromUtf8("verticalLayout_6"));
+        verticalLayout_6->setSizeConstraint(QLayout::SetMaximumSize);
+        listView_Subtitles = new ListView(dockWidgetContents_5);
+        listView_Subtitles->setObjectName(QString::fromUtf8("listView_Subtitles"));
+        listView_Subtitles->setStyleSheet(QString::fromUtf8("QListView  {\n"
+"    show-decoration-selected: 1; /* make the selection span the entire width of the view */\n"
+"}\n"
+"\n"
+"QListView::item:selected  {\n"
+"    border: 1px solid #6a6ea9;\n"
+"}\n"
+" \n"
+"QListView::item:selected:!active  {\n"
+"    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,\n"
+"                                stop: 0 #6a6ea9, stop: 1 #888dd9);\n"
+"}\n"
+" \n"
+"QListView::item:selected:active  {\n"
+"    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,\n"
+"                                stop: 0 #6a6ea9, stop: 1 #888dd9);\n"
+"}\n"
+" \n"
+"QListView::item:hover  {\n"
+"    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,\n"
+"                                stop: 0 #FAFBFE, stop: 1 #DCDEF1);\n"
+"}"));
+        listView_Subtitles->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        listView_Subtitles->setSelectionMode(QAbstractItemView::MultiSelection);
+        listView_Subtitles->setSelectionBehavior(QAbstractItemView::SelectRows);
+        listView_Subtitles->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+        listView_Subtitles->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+        listView_Subtitles->setResizeMode(QListView::Adjust);
+        listView_Subtitles->setLayoutMode(QListView::Batched);
+        listView_Subtitles->setSpacing(2);
+        listView_Subtitles->setWordWrap(true);
 
-        verticalLayout_6->addWidget(listView_Events);
+        verticalLayout_6->addWidget(listView_Subtitles);
 
-        DWEvent->setWidget(dockWidgetContents_5);
-        MainWindow->addDockWidget(static_cast<Qt::DockWidgetArea>(2), DWEvent);
+        DWSubtitles->setWidget(dockWidgetContents_5);
+        MainWindow->addDockWidget(static_cast<Qt::DockWidgetArea>(2), DWSubtitles);
 
         menuBar->addAction(menu->menuAction());
         menuBar->addAction(menuSettings->menuAction());
+        menu->addAction(action_Connection);
+        menu->addSeparator();
+        menu->addAction(action_Exit);
         menuSettings->addAction(actionHttp);
 
         retranslateUi(MainWindow);
@@ -379,6 +407,8 @@ public:
     {
         MainWindow->setWindowTitle(QApplication::translate("MainWindow", "ArtixVideo", 0, QApplication::UnicodeUTF8));
         actionHttp->setText(QApplication::translate("MainWindow", "Http", 0, QApplication::UnicodeUTF8));
+        action_Connection->setText(QApplication::translate("MainWindow", "\320\237\320\276\320\264\320\272\320\273\321\216\321\207\320\265\320\275\320\270\321\217", 0, QApplication::UnicodeUTF8));
+        action_Exit->setText(QApplication::translate("MainWindow", "\320\222\321\213\321\205\320\276\320\264", 0, QApplication::UnicodeUTF8));
         pushButton_PreviewFragment->setText(QApplication::translate("MainWindow", "|<", 0, QApplication::UnicodeUTF8));
         pushButton_Play->setText(QString());
         pushButton_Pause->setText(QString());
@@ -388,13 +418,13 @@ public:
         label_maxTime->setText(QApplication::translate("MainWindow", "00:00:00", 0, QApplication::UnicodeUTF8));
         pushButton_FullScreen->setText(QApplication::translate("MainWindow", "full", 0, QApplication::UnicodeUTF8));
         menu->setTitle(QApplication::translate("MainWindow", "\320\244\320\260\320\271\320\273", 0, QApplication::UnicodeUTF8));
-        menuSettings->setTitle(QApplication::translate("MainWindow", "Settings", 0, QApplication::UnicodeUTF8));
-        DWQuery->setWindowTitle(QApplication::translate("MainWindow", "Query", 0, QApplication::UnicodeUTF8));
+        menuSettings->setTitle(QApplication::translate("MainWindow", "\320\235\320\260\321\201\321\202\321\200\320\276\320\271\320\272\320\270", 0, QApplication::UnicodeUTF8));
+        DWQuery->setWindowTitle(QApplication::translate("MainWindow", "\320\227\320\260\320\277\321\200\320\276\321\201\321\213", 0, QApplication::UnicodeUTF8));
         tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("MainWindow", "Tab 1", 0, QApplication::UnicodeUTF8));
         tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("MainWindow", "Tab 2", 0, QApplication::UnicodeUTF8));
         pushButton_Find->setText(QApplication::translate("MainWindow", "\320\237\320\276\320\270\321\201\320\272", 0, QApplication::UnicodeUTF8));
-        DWResult->setWindowTitle(QApplication::translate("MainWindow", "Result", 0, QApplication::UnicodeUTF8));
-        DWEvent->setWindowTitle(QApplication::translate("MainWindow", "Events", 0, QApplication::UnicodeUTF8));
+        DWResult->setWindowTitle(QApplication::translate("MainWindow", "\320\240\320\265\320\267\321\203\320\273\321\214\321\202\320\260\321\202\321\213 \320\277\320\276\320\270\321\201\320\272\320\260", 0, QApplication::UnicodeUTF8));
+        DWSubtitles->setWindowTitle(QApplication::translate("MainWindow", "\320\241\321\203\320\261\321\202\320\270\321\202\321\200\321\213", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
 };

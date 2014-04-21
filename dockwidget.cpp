@@ -12,11 +12,11 @@ DockWidget::~DockWidget()
 
 QSize DockWidget::sizeHint() const
 {
-    QSize sh = QDockWidget::sizeHint();
-    sh.setWidth(400);
-    sh.setHeight(250);
+//    QSize sh = QDockWidget::sizeHint();
+//    sh.setWidth(500);
+//    sh.setHeight(500);
 
-    return sh;
+//    return sh;
 }
 
 void DockWidget::resizeEvent(QResizeEvent *) const

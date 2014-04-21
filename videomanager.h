@@ -48,6 +48,7 @@ private:
     QPair<QString, QDateTime> search(QDateTime &selectedDateTime,
                                  TypeRequestedVideo typeRequestedVideo);
     QString downloadFile(QUrl &url, QString &folderName);
+    QStringList loadFileNamesFromIndexFile(QDateTime &selectedTime);
     bool downloadIndexFile(QDateTime &selectedTime);
     QStringList getVideoFileNames(QString indexFileName);
     QPair<QString, QTime> searchSuitableFileName(const QList<QTime> &timeStartVideo,

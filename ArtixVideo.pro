@@ -27,7 +27,8 @@ SOURCES += main.cpp\
     videomanager.cpp \
     config.cpp \
     subtitlesmanager.cpp \
-    listview.cpp
+    listview.cpp \
+    connectionform.cpp
 
 HEADERS  += mainwindow.h \
     sql.h \
@@ -44,9 +45,11 @@ HEADERS  += mainwindow.h \
     videomanager.h \
     config.h \
     subtitlesmanager.h \
-    listview.h
+    listview.h \
+    connectionform.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    connectionform.ui
 
 OTHER_FILES += \
     Queries.xml

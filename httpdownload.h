@@ -2,7 +2,6 @@
 #define HTTPDOWNLOAD_H
 
 #include <QObject>
-#include <QtGui>
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
@@ -15,7 +14,11 @@ private:
     QString path;
     QString lastFileName;
     QNetworkAccessManager manager;
-    QMap<QString, QString> queueUrl; // key - url, value - name folder kuda nugno sohranit fayl
+    /**
+     * @brief queueUrl
+     * key - url, value - название папки, в которую необходимо сохранить скачанный файл
+     */
+    QMap<QString, QString> queueUrl;
     bool checkUrl(const QUrl *url);
 
 public:

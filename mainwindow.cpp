@@ -6,6 +6,8 @@
 #include <QEventLoop>
 #include "videomanager.h"
 #include "subtitlesmanager.h"
+#include "connectionform.h"
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -16,13 +18,15 @@ MainWindow::MainWindow(QWidget *parent) :
     pDWQueries = ui->DWQuery;
     pDWVideo = ui->DWVideo;
     pDWResult = ui->DWResult;
-    pDWEvent = ui->DWEvent;
+    pDWSubtitles = ui->DWSubtitles;
 
     pTWQueries = ui->tabWidget;
     pPBExecQuery = ui->pushButton_Find;      // кнопка выполнения выбранного запроса
 
     createInterface();  // создаем интерфейс главного окна
 
+    connect(ui->action_Connection, SIGNAL(triggered()), this, SLOT(connectionCliched()));
+    connect(ui->action_Exit, SIGNAL(triggered()), this, SLOT(close()));
     connect(pTWQueries, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
     connect(ui->pushButton_Find, SIGNAL(clicked()), this, SLOT(clickedFind()));
     connect(ui->tableView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(getDateTimeFromCurrentRow(QModelIndex)));
@@ -35,13 +39,11 @@ MainWindow::MainWindow(QWidget *parent) :
     mediaPlayer->setMaxTimeLabel(ui->label_maxTime);
     connect(ui->pushButton_Play, SIGNAL(clicked()), ui->videoPlayer, SLOT(play()));
     connect(ui->pushButton_Pause, SIGNAL(clicked()), ui->videoPlayer, SLOT(pause()));
-    connect(ui->videoPlayer->mediaObject(), SIGNAL(bufferStatus(int)),
-            ui->progressBar_BufferingVideo, SLOT(setValue(int)));
     connect(ui->pushButton_FullScreen, SIGNAL(clicked()), ui->videoPlayer->videoWidget(), SLOT(enterFullScreen()));
     connect(ui->pushButton_NextFragment, SIGNAL(clicked()), mediaPlayer, SLOT(playNextVideo()));
     connect(ui->pushButton_PreviewFragment, SIGNAL(clicked()), mediaPlayer, SLOT(playPreviousVideo()));
 
-    SubtitlesManager::getInstance()->setListView(ui->listView_Events);
+    SubtitlesManager::getInstance()->setListView(ui->listView_Subtitles);
 
     // Восстанавливаем вид главного окна
     MainWindowMemento *memento = createMemento();
@@ -59,7 +61,6 @@ void MainWindow::createInterface()
 {
     ui->tabWidget->clear();
     ui->volumeSlider->setOrientation(Qt::Horizontal);
-    ui->progressBar_BufferingVideo->setValue(0);
     ui->pushButton_Find->setDefault(true);
 }
 
@@ -251,6 +252,12 @@ void MainWindow::tabChanged(int tabIndex)
     activateQuery(currentComboBoxIndex);
 }
 
+void MainWindow::connectionCliched()
+{
+    ConnectionForm *connectionForm = new ConnectionForm();
+    connectionForm->exec();
+}
+
 void MainWindow::clickedFind()
 {
     int currentTabIndex = pTWQueries->currentIndex();
@@ -314,32 +321,6 @@ void MainWindow::addQueryName(QString name, int indexTab, int numQueryInList)
 {
     // Добавили в комбобокс название запроса и номер этого запроса в QueryList
     comboBoxQueryList[indexTab]->addItem(name, numQueryInList);
-}
-
-void MainWindow::movedHorisontalSplitter(int pos, int index)
-{
-
-    //    ui->scrollArea->resize(pos, ui->scrollArea->height());
-    //    ui->toolBox->resize(pos - 20, ui->toolBox->height());
-    //    ui->pushButton->move(pos / 2 - ui->pushButton->width() / 2, ui->pushButton->y());
-
-}
-
-void MainWindow::resizeEvent(QResizeEvent *pe)
-{
-    //    ui->VerticalSplitter->resize(pe->size().width(), pe->size().height() - menuBar()->height() - statusBar()->height());
-    //    ui->HorisontalSplitter->resize(pe->size().width(), pe->size().height() * 2/3);
-
-    //    QList<int> sizes_widgets;
-    //    sizes_widgets << this->height() * 2 / 3 << this->height() * 1 / 3;
-    //    ui->VerticalSplitter->setSizes(sizes_widgets);
-
-    //    ui->scrollArea->resize(ui->frameToolBox->width(), ui->frameToolBox->height() - 50);
-    //    ui->toolBox->resize(ui->scrollArea->width() - 20, HeightToolBox);
-
-    //    qint32 x_button = (ui->frameToolBox->width() - ui->pushButton->width()) / 2;
-    //    qint32 y_button = ui->scrollArea->height() + (ui->frameToolBox->height() - ui->scrollArea->height()) / 2 - ui->pushButton->height() / 2;
-    //    ui->pushButton->move(x_button, y_button);
 }
 
 void MainWindow::closeEvent(QCloseEvent *pe)

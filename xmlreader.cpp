@@ -72,11 +72,6 @@ void XMLReader::traverseNode(const QDomNode &node, QList<Query> *queryList)
                     newQuery.tabName = domElement.attribute("TabName", "");
 
                     queryList->push_back(newQuery);
-
-                    //                    qDebug() << "Query:"
-                    //                    << "\nname: " << domElement.attribute("name", "")
-                    //                    << "\nchild: " << domElement.attribute("child", "")
-                    //                    << "\nischild: " << domElement.attribute("ischild", "");
                 }
                 else
                     if(domElement.tagName() == "description")
@@ -87,29 +82,16 @@ void XMLReader::traverseNode(const QDomNode &node, QList<Query> *queryList)
                         if(domElement.tagName() == "SQL")
                         {
                             queryList->back().sql = domElement.text().simplified();
-                            //                        qDebug() << "select: " << domElement.text();
                         }
                         else
                             if(domElement.tagName() == "parameter")
                             {
-
-                                //                                pNewItemFrame->addRow(domElement.attribute("name", ""), createInputBox(&domElement.attribute("type", "")));
-
                                 Parameter newParameter;
                                 newParameter.value = ":" + domElement.attribute("value", "") ;
                                 newParameter.name = domElement.attribute("name", "");
                                 newParameter.type = domElement.attribute("type", "");
 
                                 queryList->back().ParameterList.push_back(newParameter);
-
-                                //                            qDebug() << "parameter: "
-                                //                            << "\nvalue " << domElement.attribute("value", "")
-                                //                            << "\nname: " << domElement.attribute("name", "")
-                                //                            << "\ntype: " << domElement.attribute("type", "");
-                            }
-                            else
-                            {
-                                //                                QMessageBox::information(0, tr("Ошибка!"), tr("Во время чтения файла запросов встречен неизвестный тег: %1  ").arg(domElement.tagName()));
                             }
             }
         }

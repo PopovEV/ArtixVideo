@@ -3,6 +3,7 @@
 #include <QTableView>
 
 #include "sql.h"
+#include <config.h>
 
 SQL *SQL::instance = NULL;
 
@@ -19,31 +20,67 @@ SQL *SQL::getInstance()
     return instance;
 }
 
-QSqlDatabase SQL::getConnection()
+QSqlDatabase SQL::getArtixVideo()
 {
-    if(!db.isOpen() || !db.isValid())
-        instance->openConnection();
-    return db;
+    if(!dbArtixVideo.isOpen() || !dbArtixVideo.isValid()) {
+        Config *config = Config::getInstance();
+        QString hostName = config->getOption("HostName", "localhost", "Database").toString();
+        int port = config->getOption("Port", 3306, "Database").toInt();
+        QString user = config->getOption("User", "root", "Database").toString();
+        QString password = config->getOption("Password", "root", "Database").toString();
+
+        instance->openConnection(dbArtixVideo, "QMYSQL", "dbArtixVideo", "artixvideo",
+                                 user, hostName, port, password);
+    }
+    return dbArtixVideo;
 }
 
-bool SQL::openConnection()
+QSqlDatabase SQL::getLocalDB()
 {
-    db = QSqlDatabase::addDatabase("QMYSQL", "mydb");
-    db.setDatabaseName("artixvideo");
+    if(!dbLocal.isOpen() || !dbLocal.isValid()){
+        instance->openConnection(dbLocal, "QSQLITE", "dbLocal", "local.db");
+        createTables();
+    }
+    return dbLocal;
+}
 
-    db.setUserName("root");
-    db.setHostName("localhost");
-    db.setPort(3306);
-    db.setPassword("root");
+bool SQL::openConnection(QSqlDatabase &db, QString type, QString connectionName, QString dbName, QString userName,
+                         QString hostName, int port, QString password)
+{
+    db = QSqlDatabase::addDatabase(type, connectionName);
+    db.setDatabaseName(dbName);
+
+    if(type == "QMYSQL") {
+        db.setUserName(userName);
+        db.setHostName(hostName);
+        db.setPort(port);
+        db.setPassword(password);
+    }
 
     if(!db.open())
     {
         QMessageBox::critical(0, tr("Не удается открыть базу данных"),
-                            db.lastError().text(), QMessageBox::Cancel);
+                              db.lastError().text(), QMessageBox::Cancel);
         return false;
     }
 
     return true;
+}
+
+void SQL::createTables()
+{
+    QSqlQuery query(dbLocal);
+    QString queryStr("CREATE TABLE IF NOT EXISTS Connection"
+                     "("
+                     "idConnection INTEGER NOT NULL CONSTRAINT Key1 PRIMARY KEY AUTOINCREMENT,"
+                     "dbUserName TEXT,"
+                     "dbHostName TEXT,"
+                     "dbPort TEXT,"
+                     "dbPassword TEXT,"
+                     "WebAddress TEXT,"
+                     "CONSTRAINT idConnection_constr UNIQUE (idConnection)"
+                     ");");
+    query.exec(queryStr);
 }
 
 QSqlQueryModel *SQL::queryExec()
@@ -67,7 +104,7 @@ QSqlQueryModel *SQL::queryExec()
 
 bool SQL::sqlPrepare(const QString &query)
 {
-    sqlquery = QSqlQuery(getConnection());
+    sqlquery = QSqlQuery(getArtixVideo());
     return sqlquery.prepare(query);
 }
 

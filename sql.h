@@ -11,7 +11,8 @@ class SQL : public QObject
 public:
 
     static SQL *getInstance();
-    QSqlDatabase getConnection();
+    QSqlDatabase getArtixVideo();
+    QSqlDatabase getLocalDB();
 
     QSqlQueryModel *queryExec();
     bool sqlPrepare(const QString &query);
@@ -20,10 +21,13 @@ public:
     
 private:
     explicit SQL(QObject *parent = 0);
-    bool openConnection();
-
+    bool openConnection(QSqlDatabase &db, QString type, QString connectionName, QString dbName,
+                        QString userName = QString(), QString hostName = QString(), int port = 0,
+                        QString password = QString());
+    void createTables();
     static SQL *instance;
-    QSqlDatabase db;
+    QSqlDatabase dbArtixVideo;
+    QSqlDatabase dbLocal;
     QSqlQueryModel *sqlmodel;
     QSqlQuery sqlquery;
 

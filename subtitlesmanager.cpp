@@ -18,7 +18,7 @@ SubtitlesManager *SubtitlesManager::getInstance()
 
 void SubtitlesManager::loadSubtitles(const QDateTime *startVideo, const QDateTime *endVideo)
 {
-    QSqlDatabase db = SQL::getInstance()->getConnection();
+    QSqlDatabase db = SQL::getInstance()->getArtixVideo();
     if(!db.isValid())
         return;
 
