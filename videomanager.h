@@ -5,7 +5,9 @@
 #include <QDateTime>
 #include <QPair>
 #include <QMap>
+#include <QProgressBar>
 #include "httpdownload.h"
+#include "downloadindicator.h"
 
 class VideoManager : public QObject
 {
@@ -45,11 +47,16 @@ public:
      */
     void preloadVideo(const QDateTime &startVideoDateTime);
 
+    void setProgressBar(QProgressBar *progressBar);
+
 private:
     explicit VideoManager(QObject *parent = 0);
     ~VideoManager();
     static VideoManager *instance;
     static HttpDownload *httpDownload;
+
+    QProgressBar *progressBar;
+    DownloadIndicator *downloadIndicator;
 
     QPair<QString, QDateTime> search(const QDateTime &selectedDateTime,
                                  TypeRequestedVideo typeRequestedVideo);

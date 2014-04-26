@@ -11,18 +11,18 @@ HttpDownload::HttpDownload(QObject *parent) :
     connect(&manager, SIGNAL(finished(QNetworkReply*)), SLOT(downloadFinished(QNetworkReply*)));
 }
 
-void HttpDownload::doDownload(const QUrl &url, QString &nameFolder)
+QNetworkReply *HttpDownload::doDownload(const QUrl &url, QString &nameFolder)
 {
     if (queueUrl.contains(url.toString()))
-        return;
+        return NULL;
 
     if (!checkUrl(&url))
-        return;
+        return NULL;
 
     lastUrl = url;
     queueUrl.insert(url.toString(), nameFolder);
     QNetworkRequest request(url);
-    manager.get(request);
+    return manager.get(request);
 }
 
 void HttpDownload::downloadFinished(QNetworkReply *reply)

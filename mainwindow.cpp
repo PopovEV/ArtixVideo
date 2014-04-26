@@ -46,6 +46,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->pushButton_PreviousFragment, SIGNAL(clicked()), mediaPlayer, SLOT(playPreviousVideo()));
 
     SubtitlesManager::getInstance()->setListView(ui->listView_Subtitles);
+    VideoManager::getInstance()->setProgressBar(ui->progressBar_loadVideo);
 
     // Восстанавливаем вид главного окна
     MainWindowMemento *memento = createMemento();

@@ -16,12 +16,15 @@ VideoManager::VideoManager(QObject *parent) :
     QObject(parent)
 {
     httpDownload = new HttpDownload();
+    downloadIndicator = new DownloadIndicator();
 }
 
 VideoManager::~VideoManager()
 {
     if(httpDownload)
-        delete httpDownload;
+        httpDownload->deleteLater();
+    if(downloadIndicator)
+        downloadIndicator->deleteLater();
 }
 
 VideoManager *VideoManager::getInstance()
@@ -77,6 +80,12 @@ void VideoManager::preloadVideo(const QDateTime &startVideoDateTime)
         QUrl videoFileUrl(webAddress + date + "/" + fileNameAndStartTime.first);
         httpDownload->doDownload(videoFileUrl, date);
     }
+}
+
+void VideoManager::setProgressBar(QProgressBar *progressBar)
+{
+    this->progressBar = progressBar;
+    downloadIndicator->setProgressBar(progressBar);
 }
 
 QPair<QString, QDateTime> VideoManager::search(const QDateTime &selectedDateTime,
@@ -150,13 +159,15 @@ QString VideoManager::downloadFile(QUrl &url, QString &folderName)
 {
     QEventLoop eventLoop;
     connect(httpDownload, SIGNAL(fileDownloaded()), &eventLoop, SLOT(quit()));
-    httpDownload->doDownload(url, folderName);
+    QNetworkReply *reply = httpDownload->doDownload(url, folderName);
+    if(reply) {
+        downloadIndicator->setReply(reply);
+    }
     eventLoop.exec();
 
     QString videoFileName = httpDownload->getLastFileName();
     if(videoFileName.isEmpty()) {
-        QMessageBox::information(0, "Скачивание файла", "Не удалось скачать подходящий видеофрагмент. "
-                                 /*+ url.toString()*/);
+        QMessageBox::information(0, "Скачивание файла", "Не удалось скачать подходящий видеофрагмент");
         return QString();
     }
 

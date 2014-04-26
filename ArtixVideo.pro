@@ -28,7 +28,8 @@ SOURCES += main.cpp\
     subtitlesmanager.cpp \
     listview.cpp \
     connectionform.cpp \
-    settingsform.cpp
+    settingsform.cpp \
+    downloadindicator.cpp
 
 HEADERS  += mainwindow.h \
     sql.h \
@@ -46,7 +47,8 @@ HEADERS  += mainwindow.h \
     subtitlesmanager.h \
     listview.h \
     connectionform.h \
-    settingsform.h
+    settingsform.h \
+    downloadindicator.h
 
 FORMS    += mainwindow.ui \
     connectionform.ui \
