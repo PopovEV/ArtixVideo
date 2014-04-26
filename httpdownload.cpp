@@ -1,5 +1,4 @@
 #include "httpdownload.h"
-#include "httpdialog.h"
 
 #include <QDebug>
 #include <QFile>
@@ -12,12 +11,18 @@ HttpDownload::HttpDownload(QObject *parent) :
     connect(&manager, SIGNAL(finished(QNetworkReply*)), SLOT(downloadFinished(QNetworkReply*)));
 }
 
-bool HttpDownload::doDownload(const QUrl &url, QString &nameFolder)
+void HttpDownload::doDownload(const QUrl &url, QString &nameFolder)
 {
+    if (queueUrl.contains(url.toString()))
+        return;
+
+    if (!checkUrl(&url))
+        return;
+
     lastUrl = url;
     queueUrl.insert(url.toString(), nameFolder);
     QNetworkRequest request(url);
-    QNetworkReply *reply = manager.get(request);
+    manager.get(request);
 }
 
 void HttpDownload::downloadFinished(QNetworkReply *reply)
@@ -57,11 +62,8 @@ bool HttpDownload::saveToDisk(const QString &fileName, QIODevice *data)
 
 QString HttpDownload::saveFileName(const QUrl &url)
 {
-    qDebug() << url;
     QString path = url.path();
-    qDebug() << path;
     QString basename = QFileInfo(path).fileName();
-    qDebug() << basename;
 
     if (basename.isEmpty())
         basename = "index.html";

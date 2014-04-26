@@ -15,8 +15,13 @@ public:
     explicit SettingsForm(QWidget *parent = 0);
     ~SettingsForm();
 
+public slots:
+    virtual void accept();
+
 private:
     Ui::SettingsForm *ui;
+
+
 };
 
 #endif // SETTINGSFORM_H

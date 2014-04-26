@@ -7,6 +7,7 @@
 #include "videomanager.h"
 #include "subtitlesmanager.h"
 #include "connectionform.h"
+#include "settingsform.h"
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -21,11 +22,11 @@ MainWindow::MainWindow(QWidget *parent) :
     pDWSubtitles = ui->DWSubtitles;
 
     pTWQueries = ui->tabWidget;
-    pPBExecQuery = ui->pushButton_Find;      // кнопка выполнения выбранного запроса
-
+    pPBExecQuery = ui->pushButton_Find;
     createInterface();  // создаем интерфейс главного окна
 
     connect(ui->action_Connection, SIGNAL(triggered()), this, SLOT(connectionCliched()));
+    connect(ui->action_Settings, SIGNAL(triggered()), this, SLOT(settingsClicked()));
     connect(ui->action_Exit, SIGNAL(triggered()), this, SLOT(close()));
     connect(pTWQueries, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
     connect(ui->pushButton_Find, SIGNAL(clicked()), this, SLOT(clickedFind()));
@@ -39,9 +40,10 @@ MainWindow::MainWindow(QWidget *parent) :
     mediaPlayer->setMaxTimeLabel(ui->label_maxTime);
     connect(ui->pushButton_Play, SIGNAL(clicked()), ui->videoPlayer, SLOT(play()));
     connect(ui->pushButton_Pause, SIGNAL(clicked()), ui->videoPlayer, SLOT(pause()));
+    connect(ui->pushButton_Stop, SIGNAL(clicked()), ui->videoPlayer, SLOT(stop()));
     connect(ui->pushButton_FullScreen, SIGNAL(clicked()), ui->videoPlayer->videoWidget(), SLOT(enterFullScreen()));
     connect(ui->pushButton_NextFragment, SIGNAL(clicked()), mediaPlayer, SLOT(playNextVideo()));
-    connect(ui->pushButton_PreviewFragment, SIGNAL(clicked()), mediaPlayer, SLOT(playPreviousVideo()));
+    connect(ui->pushButton_PreviousFragment, SIGNAL(clicked()), mediaPlayer, SLOT(playPreviousVideo()));
 
     SubtitlesManager::getInstance()->setListView(ui->listView_Subtitles);
 
@@ -137,22 +139,17 @@ void MainWindow::getDateTimeFromCurrentRow(QModelIndex ModelIndex)
     for(int i = 0; i < columnCount; ++i)
     {
         QString headerData =  pSqlModel->headerData(i, Qt::Horizontal).toString().toUpper();
-        if(headerData == tr("ВРЕМЯ"))
+        if(headerData == "ВРЕМЯ" || headerData == "ДАТА НАЧАЛА")
         {
             QModelIndex newModelIndex = pSqlModel->index(currentRow, i, QModelIndex());
             QDateTime selectedDateTime = pSqlModel->data(newModelIndex, Qt::DisplayRole).toDateTime();
-            //downloadFile(selectedTime);
-            QPair<QString, QDateTime> videoFilePathAndStartTime =
-                    VideoManager::getInstance()->getVideo(selectedDateTime);
-            qDebug() << videoFilePathAndStartTime.first;
-            qDebug() << videoFilePathAndStartTime.second;
-            mediaPlayer->playVideo(videoFilePathAndStartTime.first, videoFilePathAndStartTime.second,
-                                   selectedDateTime);
+
+            mediaPlayer->playVideo(selectedDateTime);
             return;
         }
     }
 
-    QMessageBox::information(this, "Error", "Don't find field \"Time\" in sql  model!");
+    QMessageBox::information(this, "Ошибка", "Не удалось найти поле \"Время\" в выбранной строке.");
 }
 
 void MainWindow::loadQueries()
@@ -225,7 +222,6 @@ void MainWindow::activateQuery(int index)
 
     //Create widgets for input sql parameters
     QFormLayout *formLayout = formLayoutQueryList[currentTabIndex];
-//    clean(*formLayout);
     cleanFormLayout(formLayout);
     delete formLayout;
 
@@ -239,10 +235,8 @@ void MainWindow::activateQuery(int index)
     descriptionList.at(currentTabIndex)->setText(selectedQuery.description);
 
     foreach (Parameter param, selectedQuery.ParameterList) {
-        qDebug() << param.name;
-        qDebug() << param.type;
         formLayout->addRow(param.name,
-                           WidgetsFactory::getInstance()->getWidget(param.type));
+                           WidgetsFactory::getInstance()->getWidget(param.type, param.defaultValue));
     }
 }
 
@@ -256,6 +250,24 @@ void MainWindow::connectionCliched()
 {
     ConnectionForm *connectionForm = new ConnectionForm();
     connectionForm->exec();
+    connectionForm->deleteLater();
+}
+
+void MainWindow::settingsClicked()
+{
+    SettingsForm *settingsForm = new SettingsForm();
+    settingsForm->exec();
+    settingsForm->deleteLater();
+}
+
+void MainWindow::movableDockWidgetClicked()
+{
+
+}
+
+void MainWindow::setDefaultDockWidgetPosition()
+{
+
 }
 
 void MainWindow::clickedFind()
@@ -267,7 +279,7 @@ void MainWindow::clickedFind()
 
     SQL *pSQL = SQL::getInstance();
     if (!pSQL->sqlPrepare(currentQuery.sql)) {
-        QMessageBox::information(0, "Error", "Error prepare query\n" + currentQuery.sql);
+        QMessageBox::information(0, "Ошибка", "Не удалось подготовить запрос.\n" + currentQuery.sql);
         return;
     }
 
@@ -289,15 +301,12 @@ void MainWindow::clickedFind()
 
         if(QDateEdit *pDateEdit = dynamic_cast<QDateEdit *> (parameterWidget)) {
             str = pDateEdit->date().toString("yyyy-MM-dd");
-            qDebug() << "QDateEdit";
         } else {
             if(QDateTimeEdit *pDateTimeEdit = dynamic_cast<QDateTimeEdit *> (parameterWidget)) {
                 str = pDateTimeEdit->dateTime().toString("yyyy-MM-dd hh:mm:ss");
-                qDebug() << "QDateTimeEdit";
             } else {
                 if(QLineEdit *pLineEdit = dynamic_cast<QLineEdit *> (parameterWidget)) {
                     str = pLineEdit->text();
-                    qDebug() << "QLineEdit";
                 }
             }
         }

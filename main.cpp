@@ -5,7 +5,6 @@
 #include "sql.h"
 #include "mediaplayer.h"
 #include "httpdownload.h"
-#include "httpdialog.h"
 
 int main(int argc, char *argv[])
 {

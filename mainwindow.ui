@@ -104,7 +104,7 @@ QMainWindow::separator::horizontal {
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
-           <widget class="QPushButton" name="pushButton_PreviewFragment">
+           <widget class="QPushButton" name="pushButton_PreviousFragment">
             <property name="minimumSize">
              <size>
               <width>30</width>
@@ -117,8 +117,9 @@ QMainWindow::separator::horizontal {
               <height>30</height>
              </size>
             </property>
-            <property name="text">
-             <string>|&lt;</string>
+            <property name="icon">
+             <iconset resource="resource.qrc">
+              <normaloff>:/icon/icon/previous.png</normaloff>:/icon/icon/previous.png</iconset>
             </property>
            </widget>
           </item>
@@ -142,6 +143,12 @@ QMainWindow::separator::horizontal {
             <property name="icon">
              <iconset resource="resource.qrc">
               <normaloff>:/icon/icon/play.png</normaloff>:/icon/icon/play.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>24</width>
+              <height>24</height>
+             </size>
             </property>
            </widget>
           </item>
@@ -169,6 +176,26 @@ QMainWindow::separator::horizontal {
            </widget>
           </item>
           <item>
+           <widget class="QPushButton" name="pushButton_Stop">
+            <property name="minimumSize">
+             <size>
+              <width>30</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>30</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="icon">
+             <iconset resource="resource.qrc">
+              <normaloff>:/icon/icon/stop.png</normaloff>:/icon/icon/stop.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="pushButton_NextFragment">
             <property name="minimumSize">
              <size>
@@ -182,8 +209,9 @@ QMainWindow::separator::horizontal {
               <height>30</height>
              </size>
             </property>
-            <property name="text">
-             <string>&gt;|</string>
+            <property name="icon">
+             <iconset resource="resource.qrc">
+              <normaloff>:/icon/icon/next.png</normaloff>:/icon/icon/next.png</iconset>
             </property>
            </widget>
           </item>
@@ -271,9 +299,6 @@ QMainWindow::separator::horizontal {
               <height>16777215</height>
              </size>
             </property>
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
             <property name="tracking">
              <bool>true</bool>
             </property>
@@ -296,8 +321,9 @@ QMainWindow::separator::horizontal {
               <height>30</height>
              </size>
             </property>
-            <property name="text">
-             <string>full</string>
+            <property name="icon">
+             <iconset resource="resource.qrc">
+              <normaloff>:/icon/icon/fullscreen.png</normaloff>:/icon/icon/fullscreen.png</iconset>
             </property>
            </widget>
           </item>
@@ -330,10 +356,17 @@ QMainWindow::separator::horizontal {
     <property name="title">
      <string>Настройки</string>
     </property>
-    <addaction name="actionHttp"/>
+    <addaction name="action_Settings"/>
+   </widget>
+   <widget class="QMenu" name="menu_2">
+    <property name="title">
+     <string>Окно</string>
+    </property>
+    <addaction name="action_MovableDockWidgets"/>
    </widget>
    <addaction name="menu"/>
    <addaction name="menuSettings"/>
+   <addaction name="menu_2"/>
   </widget>
   <widget class="DockWidget" name="DWQuery">
    <property name="sizePolicy">
@@ -341,6 +374,9 @@ QMainWindow::separator::horizontal {
      <horstretch>0</horstretch>
      <verstretch>0</verstretch>
     </sizepolicy>
+   </property>
+   <property name="floating">
+    <bool>false</bool>
    </property>
    <property name="features">
     <set>QDockWidget::NoDockWidgetFeatures</set>
@@ -562,9 +598,9 @@ QListView::item:hover  {
     </layout>
    </widget>
   </widget>
-  <action name="actionHttp">
+  <action name="action_Settings">
    <property name="text">
-    <string>Http</string>
+    <string>Общие</string>
    </property>
   </action>
   <action name="action_Connection">
@@ -575,6 +611,11 @@ QListView::item:hover  {
   <action name="action_Exit">
    <property name="text">
     <string>Выход</string>
+   </property>
+  </action>
+  <action name="action_MovableDockWidgets">
+   <property name="text">
+    <string>Перемещение окон</string>
    </property>
   </action>
  </widget>
@@ -607,6 +648,18 @@ QListView::item:hover  {
    <header>listview.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>pushButton_Find</tabstop>
+  <tabstop>tableView</tabstop>
+  <tabstop>pushButton_PreviousFragment</tabstop>
+  <tabstop>pushButton_Play</tabstop>
+  <tabstop>pushButton_Pause</tabstop>
+  <tabstop>pushButton_Stop</tabstop>
+  <tabstop>pushButton_NextFragment</tabstop>
+  <tabstop>pushButton_FullScreen</tabstop>
+  <tabstop>listView_Subtitles</tabstop>
+ </tabstops>
  <resources>
   <include location="resource.qrc"/>
  </resources>

@@ -7,7 +7,7 @@ class WidgetsFactory
 {
 public:
     static WidgetsFactory *getInstance();
-    QWidget *getWidget(const QString &type);
+    QWidget *getWidget(const QString &type, const QString &defaultValue);
 
 private:
     WidgetsFactory();

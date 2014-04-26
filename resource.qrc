@@ -3,7 +3,11 @@
         <file>Queries.xml</file>
     </qresource>
     <qresource prefix="/icon">
+        <file>icon/stop.png</file>
+        <file>icon/previous.png</file>
         <file>icon/play.png</file>
         <file>icon/pause.png</file>
+        <file>icon/next.png</file>
+        <file>icon/fullscreen.png</file>
     </qresource>
 </RCC>

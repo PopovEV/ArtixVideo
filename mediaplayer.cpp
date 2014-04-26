@@ -26,9 +26,14 @@ MediaPlayer::~MediaPlayer()
 
 }
 
-void MediaPlayer::playVideo(const QString &path, const QDateTime &startDateTime,
-                            const QDateTime &selectedDateTime)
+void MediaPlayer::playVideo(const QDateTime &selectedDateTime)
 {
+    QPair<QString, QDateTime> videoFilePathAndStartTime =
+            VideoManager::getInstance()->getVideo(selectedDateTime);
+
+    QString path = videoFilePathAndStartTime.first;
+    QDateTime startDateTime = videoFilePathAndStartTime.second;
+
     if (!path.isEmpty()) {
         this->startDateTime = startDateTime;
         this->selectedDateTime = selectedDateTime;
@@ -36,6 +41,8 @@ void MediaPlayer::playVideo(const QString &path, const QDateTime &startDateTime,
         videoPlayer->load(MediaSource(path));
         loadSubtitles(startDateTime);
         videoPlayer->play();
+
+        VideoManager::getInstance()->preloadVideo(startDateTime);
     }
 }
 
@@ -83,6 +90,8 @@ void MediaPlayer::playNextVideo()
     videoPlayer->load(MediaSource(nextVideo.first));
     loadSubtitles(startDateTime);
     videoPlayer->play();
+
+    VideoManager::getInstance()->preloadVideo(startDateTime);
 }
 
 void MediaPlayer::playPreviousVideo()
@@ -100,6 +109,8 @@ void MediaPlayer::playPreviousVideo()
     videoPlayer->load(MediaSource(nextVideo.first));
     loadSubtitles(startDateTime);
     videoPlayer->play();
+
+    VideoManager::getInstance()->preloadVideo(startDateTime);
 }
 
 void MediaPlayer::loadSubtitles(const QDateTime &startTime)

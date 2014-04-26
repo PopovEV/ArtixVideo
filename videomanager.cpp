@@ -31,27 +31,62 @@ VideoManager *VideoManager::getInstance()
     return instance;
 }
 
-QPair<QString, QDateTime> VideoManager::getVideo(QDateTime &selectedDateTime)
+QPair<QString, QDateTime> VideoManager::getVideo(const QDateTime &selectedDateTime)
 {
     return search(selectedDateTime, Current);
 }
 
-QPair<QString, QDateTime> VideoManager::getNextVideo(QDateTime &startVideoDateTime)
+QPair<QString, QDateTime> VideoManager::getNextVideo(const QDateTime &startVideoDateTime)
 {
     return search(startVideoDateTime, Next);
 }
 
-QPair<QString, QDateTime> VideoManager::getPreviousVideo(QDateTime &startVideoDateTime)
+QPair<QString, QDateTime> VideoManager::getPreviousVideo(const QDateTime &startVideoDateTime)
 {
     return search(startVideoDateTime, Previous);
 }
 
-QPair<QString, QDateTime> VideoManager::search(QDateTime &selectedDateTime,
+void VideoManager::preloadVideo(const QDateTime &startVideoDateTime)
+{
+    QDate dateStart = startVideoDateTime.date();
+    QString dirNameFormat = Config::getInstance()->getOption("DirNameFormat", "yyyyMMdd").toString();
+    QString date = dateStart.toString(dirNameFormat);
+    QString webAddress = Config::getInstance()->
+            getOption("WebAddress", "http://localhost/artixvideo/", "VideoArchive").toString();
+
+    if(!cache.contains(dateStart))
+        return;
+
+    QList<QTime> videoFiles = cache.value(dateStart);
+
+    for (int requestedType = Next; requestedType <= Previous; ++requestedType) {
+        QPair<QString, QTime> fileNameAndStartTime = searchSuitableFileName(videoFiles,
+                                                                            startVideoDateTime.time(),
+                                                                            (TypeRequestedVideo)requestedType);
+        if (fileNameAndStartTime.first.isEmpty())
+            continue;
+
+        QDir dir(QDir::currentPath());
+        dir.cd("download");
+        dir.cd(date);
+        QString absoluteFilePath = dir.absoluteFilePath(fileNameAndStartTime.first);
+
+        if(QFile::exists(absoluteFilePath))
+            continue;
+
+        QUrl videoFileUrl(webAddress + date + "/" + fileNameAndStartTime.first);
+        httpDownload->doDownload(videoFileUrl, date);
+    }
+}
+
+QPair<QString, QDateTime> VideoManager::search(const QDateTime &selectedDateTime,
                                                VideoManager::TypeRequestedVideo typeRequestedVideo)
 {
     QDate selectedDate = selectedDateTime.date();
     QString dirNameFormat = Config::getInstance()->getOption("DirNameFormat", "yyyyMMdd").toString();
     QString date = selectedDate.toString(dirNameFormat);
+    QString webAddress = Config::getInstance()->
+            getOption("WebAddress", "http://localhost/artixvideo/", "VideoArchive").toString();
 
     QPair<QString, QDateTime> video;
     if(cache.contains(selectedDate)) {
@@ -67,6 +102,8 @@ QPair<QString, QDateTime> VideoManager::search(QDateTime &selectedDateTime,
                                                                             selectedDateTime.time(),
                                                                             typeRequestedVideo);
         if (fileNameAndStartTime.first.isEmpty()) {
+            QMessageBox::information(0, "Поиск видеофайла",
+                                     "Не удается найти подходящий по времени видеофрагмент.");
             return video;
         }
 
@@ -79,9 +116,6 @@ QPair<QString, QDateTime> VideoManager::search(QDateTime &selectedDateTime,
             video.first = absoluteFilePath;
             video.second = QDateTime(selectedDate, fileNameAndStartTime.second);
         } else {
-            QString webAddress = Config::getInstance()->
-                    getOption("WebAddress", "http://localhost/artixvideo/", "VideoArchive").toString();
-
             QUrl videoFileUrl(webAddress + date + "/" + fileNameAndStartTime.first);
             video.first = downloadFile(videoFileUrl, date);
             video.second = QDateTime(selectedDateTime.date(), fileNameAndStartTime.second);
@@ -99,11 +133,10 @@ QPair<QString, QDateTime> VideoManager::search(QDateTime &selectedDateTime,
                                                                             selectedDateTime.time(),
                                                                             typeRequestedVideo);
         if(fileNameAndStartTime.first.isEmpty()) {
+            QMessageBox::information(0, "Поиск видеофайла",
+                                     "Не удается найти подходящий по времени видеофрагмент.");
             return video;
         }
-
-        QString webAddress = Config::getInstance()->
-                getOption("WebAddress", "http://localhost/artixvideo/", "VideoArchive").toString();
 
         QUrl videoFileUrl(webAddress + date + "/" + fileNameAndStartTime.first);
         video.first = downloadFile(videoFileUrl, date);
@@ -130,7 +163,7 @@ QString VideoManager::downloadFile(QUrl &url, QString &folderName)
     return videoFileName;
 }
 
-QStringList VideoManager::loadFileNamesFromIndexFile(QDateTime &selectedTime)
+QStringList VideoManager::loadFileNamesFromIndexFile(const QDateTime &selectedTime)
 {
     if(!downloadIndexFile(selectedTime)) {
         return QStringList();
@@ -140,7 +173,7 @@ QStringList VideoManager::loadFileNamesFromIndexFile(QDateTime &selectedTime)
     return getVideoFileNames(indexFileName);
 }
 
-bool VideoManager::downloadIndexFile(QDateTime &selectedTime)
+bool VideoManager::downloadIndexFile(const QDateTime &selectedTime)
 {
     QString date;
     QString dirNameFormat = Config::getInstance()->getOption("DirNameFormat", "yyyyMMdd").toString();
@@ -219,8 +252,6 @@ QPair<QString, QTime> VideoManager::searchSuitableFileName(const QList<QTime> &t
 
 
     if(suitableTime.isNull()) {
-        QMessageBox::information(0, "Поиск видеофайла",
-                                 "Не удается найти подходящий по времени видеофрагмент.");
         return QPair<QString, QTime>(QString(), QTime());
     }
 

@@ -234,6 +234,18 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>lineEdit_dbAddress</tabstop>
+  <tabstop>spinBox_dbPort</tabstop>
+  <tabstop>lineEdit_dbUser</tabstop>
+  <tabstop>lineEdit_dbPassword</tabstop>
+  <tabstop>lineEdit_webAddress</tabstop>
+  <tabstop>pushButton_Add</tabstop>
+  <tabstop>pushButton_Delete</tabstop>
+  <tabstop>tableView</tabstop>
+  <tabstop>pushButton_Connect</tabstop>
+  <tabstop>pushButton_Close</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

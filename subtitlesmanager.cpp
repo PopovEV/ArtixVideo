@@ -91,6 +91,11 @@ void SubtitlesManager::changePosition(const QString &currentTime)
     }
 }
 
+void SubtitlesManager::clear()
+{
+
+}
+
 ListView *SubtitlesManager::getListView() const
 {
     return listView;

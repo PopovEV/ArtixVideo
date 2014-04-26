@@ -10,6 +10,7 @@ struct Parameter{
     QString value;
     QString name;
     QString type;
+    QString defaultValue;
 };
 
 struct Query{

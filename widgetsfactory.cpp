@@ -18,7 +18,7 @@ WidgetsFactory *WidgetsFactory::getInstance()
     return instance;
 }
 
-QWidget *WidgetsFactory::getWidget(const QString &type)
+QWidget *WidgetsFactory::getWidget(const QString &type, const QString &defaultValue)
 {
     QString typeUpper = type.toUpper();
     if(typeUpper == "INT")
@@ -27,6 +27,7 @@ QWidget *WidgetsFactory::getWidget(const QString &type)
 
         QLineEdit *pLineEdit = new QLineEdit();
         pLineEdit->setValidator(pLongIntValidator);
+        pLineEdit->setText(defaultValue);
 
         return pLineEdit;
     }
@@ -34,6 +35,7 @@ QWidget *WidgetsFactory::getWidget(const QString &type)
         if(typeUpper == "CHAR")
         {
             QLineEdit *pLineEdit = new QLineEdit();
+            pLineEdit->setText(defaultValue);
 
             return pLineEdit;
         }
@@ -44,6 +46,7 @@ QWidget *WidgetsFactory::getWidget(const QString &type)
 
                 QLineEdit *pLineEdit = new QLineEdit();
                 pLineEdit->setValidator(pCurrencyValidator);
+                pLineEdit->setText(defaultValue);
 
                 return pLineEdit;
             }
@@ -52,6 +55,7 @@ QWidget *WidgetsFactory::getWidget(const QString &type)
                 {
                     QDateEdit *pDateEdit = new QDateEdit(QDate::currentDate());
                     pDateEdit->setCalendarPopup(true);
+                    pDateEdit->setDate(QDate().fromString(defaultValue, "yyyy-MM-dd"));
 
                     return pDateEdit;
                 }
@@ -60,6 +64,7 @@ QWidget *WidgetsFactory::getWidget(const QString &type)
                     {
                         QDateTimeEdit *pDateTimeEdit = new QDateTimeEdit(QDateTime::currentDateTime());
                         pDateTimeEdit->setCalendarPopup(true);
+                        pDateTimeEdit->setDateTime(QDateTime().fromString(defaultValue, "yyyy-MM-dd hh:mm:ss"));
 
                         return pDateTimeEdit;
                     }

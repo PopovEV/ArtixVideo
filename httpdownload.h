@@ -24,7 +24,7 @@ private:
 public:
     explicit HttpDownload(QObject *parent = 0);
 
-    bool doDownload(const QUrl &url, QString &nameFolder);
+    void doDownload(const QUrl &url, QString &nameFolder);
     bool saveToDisk(const QString &fileName, QIODevice *data);
     QString saveFileName(const QUrl &url);
 

@@ -90,6 +90,8 @@ void XMLReader::traverseNode(const QDomNode &node, QList<Query> *queryList)
                                 newParameter.value = ":" + domElement.attribute("value", "") ;
                                 newParameter.name = domElement.attribute("name", "");
                                 newParameter.type = domElement.attribute("type", "");
+                                newParameter.defaultValue = domElement.attribute("defaultValue", "");
+
 
                                 queryList->back().ParameterList.push_back(newParameter);
                             }

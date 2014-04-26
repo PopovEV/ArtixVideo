@@ -62,7 +62,6 @@ private:
 
 signals:
 
-
 public slots:
     void clickedFind();
     int isTabExist(QString tabName);    // существует ли уже такая вкладка?   -1 - не существует
@@ -76,6 +75,9 @@ public slots:
     void activateQuery(int index);
     void tabChanged(int tabIndex);
     void connectionCliched();
+    void settingsClicked();
+    void movableDockWidgetClicked();
+    void setDefaultDockWidgetPosition();
 
 protected:
     virtual void closeEvent(QCloseEvent *pe);

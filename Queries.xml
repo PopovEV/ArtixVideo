@@ -11,8 +11,8 @@
 	    where date_begin &gt;= :date_beg and date_end  &lt;= :date_end
         </SQL>
 	<parameters>
-                <parameter value = "date_beg" name = "Начальная дата и время:" type = "datetime"/>
-                <parameter value = "date_end" name = "Конечная дата и время:" type = "datetime"/>
+                <parameter value = "date_beg" name = "Начальная дата и время:" type = "datetime" defaultValue="2012-03-29 11:00:00"/>
+                <parameter value = "date_end" name = "Конечная дата и время:" type = "datetime" defaultValue="2012-03-29 18:00:00"/>
 	</parameters>
   </Query>
   <Query num = "2" name="Показать позицию по номеру чека" child = "" ischild = "false" TabName = "Чеки">
@@ -25,7 +25,7 @@
 	    where CheckNumber = :CheckNum
 	</SQL>
 	<parameters>
-                <parameter value = "CheckNum" name = "Номер чека:" type = "int"/>
+                <parameter value = "CheckNum" name = "Номер чека:" type = "int" defaultValue="100"/>
 	</parameters>
   </Query>
   <Query num = "3" name="Показать позицию по стоимости покупки" child = "" ischild = "false" TabName = "Товары">
@@ -63,33 +63,34 @@
 		<!-- <parameter value = "Amount" name = "Стоимость: " type = "currency"/> -->
         </parameters>
   </Query>
-    <Query num = "6" name="Информация о чеке" child = "" ischild = "true" TabName = "Чеки">
+    <Query num = "6" name="#01 - Все чеки" child = "" ischild = "false" TabName = "Чеки">
 	<description>
-
+            Необходимо обязательно ввести номер кассы и номер смены.
 	</description>
         <SQL>
-				select
-					ddate as "Время",
-					case FunctionNumber
-					when 1007 then CONCAT('Подитог:' , cast(Amount as CHAR(16)) , ' р.')
-					when 1010 then CONCAT(ItemName  , ' ' , cast(Price as CHAR(16)) , ' р. * ' , cast(Quantity as CHAR(16)) , ' = ' , cast(Amount as CHAR(16)) , 'р.')
-					when 1011 then CONCAT('Возврат: ' , ' ' , ItemName , ' ' , cast(Price as CHAR(16)) , ' р. * ' , cast(Quantity as CHAR(16)) , ' = ' , cast(Amount as CHAR(16)) , 'р.')
-					when 1012 then CONCAT('Сторно: ' , ' ' , ItemName , ' ' , cast(Price as CHAR(16)) , ' р. * ' , cast(Quantity as CHAR(16)) , ' = ' , cast(Amount as CHAR(16)) , 'р.')
-					when 1013 then CONCAT('Сторно возврата: ' , ' ' , ItemName , ' ' , cast(Price as CHAR(16)) , ' р. * ' , cast(Quantity as CHAR(16)) , ' = ' , cast(Amount as CHAR(16)) , 'р.')
-					when 1014 then CONCAT('Оплата :' , cast(Amount as CHAR(16)) , ' ' , ItemName)
-					when 1015 then CONCAT('Сторно оплаты :' , cast(Amount as CHAR(16)) , ' ' , ItemName)
-					when 1016 then CONCAT('Сдача :' , cast(Amount as CHAR(16)) , ' ' , ItemName)
-					when 1022 then CONCAT('Скидка :' , DiscountName , ' ' , cast(DiscountPercent as CHAR(16)) , '%  , ' , cast(DiscountSum as CHAR(16)) , 'р. ' , 
-					case PositionDiscount when 1 then ' (на позицию) ' else ' (на чек) ' end)
-					else CONCAT('Не определено: :' , cast(FunctionNumber as CHAR(16)))
-					end as "Позиция",
-					fraction as "мс"
-					from POS_LOG_DETAIL 
-					where id = :master_id AND FunctionNumber between 1007 and 1022
-					order by id_string
+            select
+            check_id as "id",
+            pos_id as "Касса",
+            UserName as "Имя",
+            ShiftNumber as "Смена",
+            CheckNumber as "Номер чека",
+            Amount as "Количество",
+            date_begin as "Дата начала",
+            POS_LOG_MASTER.fraction as "мс"
+            FROM POS_LOG_MASTER
+            WHERE (date_begin BETWEEN :date_start AND :date_end )
+            AND (pos_id = COALESCE(:pos_id, pos_id) )
+            AND CheckClose = 1
+            AND (:ShiftNumber = 0 or ShiftNumber = COALESCE(:ShiftNumber,ShiftNumber))
+            AND (UserName LIKE CONCAT('%', COALESCE(:UserName,''), '%'))
+            ORDER BY date_begin, POS_LOG_MASTER.fraction
         </SQL>
         <parameters>
-                <parameter value = "master_id" name = "Мастер id:" type = "int"/>
+            <parameter value = "date_start" name = "Начальная дата и время:" type = "datetime" defaultValue=""/>
+            <parameter value = "date_end" name = "Конечная дата и время:" type = "datetime" defaultValue=""/>
+            <parameter value = "pos_id" name = "Номер кассы" type = "char"/>
+            <parameter value = "ShiftNumber" name = "Номер смены" type = "int"/>
+            <parameter value = "UserName" name = "Кассир" type = "char"/>
         </parameters>
     </Query>
 </QueryList>

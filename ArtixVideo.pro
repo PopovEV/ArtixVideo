@@ -19,7 +19,6 @@ SOURCES += main.cpp\
     longintvalidator.cpp \
     currencyvalidator.cpp \
     mediaplayer.cpp \
-    httpdialog.cpp \
     httpdownload.cpp \
     dockwidget.cpp \
     widgetsfactory.cpp \
@@ -28,7 +27,8 @@ SOURCES += main.cpp\
     config.cpp \
     subtitlesmanager.cpp \
     listview.cpp \
-    connectionform.cpp
+    connectionform.cpp \
+    settingsform.cpp
 
 HEADERS  += mainwindow.h \
     sql.h \
@@ -36,7 +36,6 @@ HEADERS  += mainwindow.h \
     longintvalidator.h \
     currencyvalidator.h \
     mediaplayer.h \
-    httpdialog.h \
     httpdownload.h \
     dockwidget.h \
     widgetsfactory.h \
@@ -46,10 +45,12 @@ HEADERS  += mainwindow.h \
     config.h \
     subtitlesmanager.h \
     listview.h \
-    connectionform.h
+    connectionform.h \
+    settingsform.h
 
 FORMS    += mainwindow.ui \
-    connectionform.ui
+    connectionform.ui \
+    settingsform.ui
 
 OTHER_FILES += \
     Queries.xml

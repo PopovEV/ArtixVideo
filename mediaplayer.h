@@ -20,7 +20,8 @@ public:
     explicit MediaPlayer(VideoPlayer *videoPlayer, SeekSlider *seekSlider, VolumeSlider *volumeSlider,
                          QObject *parent = 0);
     ~MediaPlayer();
-    void playVideo(const QString &path, const QDateTime &startDateTime, const QDateTime &selectedDateTime);
+
+    void playVideo(const QDateTime &selectedDateTime);
     
     QLabel *getCurrentTimeLabel() const;
     void setCurrentTimeLabel(QLabel *value);
