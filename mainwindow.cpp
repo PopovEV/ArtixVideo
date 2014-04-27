@@ -28,6 +28,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->action_Connection, SIGNAL(triggered()), this, SLOT(connectionCliched()));
     connect(ui->action_Settings, SIGNAL(triggered()), this, SLOT(settingsClicked()));
     connect(ui->action_Exit, SIGNAL(triggered()), this, SLOT(close()));
+    connect(ui->action_MovableDockWidgets, SIGNAL(triggered(bool)), this, SLOT(movableDockWidgetClicked(bool)));
+    connect(ui->action_defaultPosition, SIGNAL(triggered()), this, SLOT(setDefaultDockWidgetPosition()));
+
     connect(pTWQueries, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
     connect(ui->pushButton_Find, SIGNAL(clicked()), this, SLOT(clickedFind()));
     connect(ui->tableView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(getDateTimeFromCurrentRow(QModelIndex)));
@@ -62,6 +65,8 @@ MainWindow::~MainWindow()
 
 void MainWindow::createInterface()
 {
+    setDockOptions(QMainWindow::AnimatedDocks | QMainWindow::AllowNestedDocks |
+                   QMainWindow::AllowTabbedDocks);
     ui->tabWidget->clear();
     ui->volumeSlider->setOrientation(Qt::Horizontal);
     ui->pushButton_Find->setDefault(true);
@@ -261,14 +266,45 @@ void MainWindow::settingsClicked()
     settingsForm->deleteLater();
 }
 
-void MainWindow::movableDockWidgetClicked()
+void MainWindow::movableDockWidgetClicked(bool cheched)
 {
+    if(cheched) {
+        pDWQueries->setFeatures(QDockWidget::DockWidgetMovable);
+        pDWResult->setFeatures(QDockWidget::DockWidgetMovable);
+        pDWSubtitles->setFeatures(QDockWidget::DockWidgetMovable);
+        pDWVideo->setFeatures(QDockWidget::DockWidgetMovable);
 
+        pDWQueries->setAllowedAreas(Qt::AllDockWidgetAreas);
+        pDWResult->setAllowedAreas(Qt::AllDockWidgetAreas);
+        pDWSubtitles->setAllowedAreas(Qt::AllDockWidgetAreas);
+        pDWVideo->setAllowedAreas(Qt::AllDockWidgetAreas);
+    } else {
+        pDWQueries->setFeatures(QDockWidget::NoDockWidgetFeatures);
+        pDWResult->setFeatures(QDockWidget::NoDockWidgetFeatures);
+        pDWSubtitles->setFeatures(QDockWidget::NoDockWidgetFeatures);
+        pDWVideo->setFeatures(QDockWidget::NoDockWidgetFeatures);
+
+        pDWQueries->setAllowedAreas(Qt::NoDockWidgetArea);
+        pDWResult->setAllowedAreas(Qt::NoDockWidgetArea);
+        pDWSubtitles->setAllowedAreas(Qt::NoDockWidgetArea);
+        pDWVideo->setAllowedAreas(Qt::NoDockWidgetArea);
+    }
 }
 
 void MainWindow::setDefaultDockWidgetPosition()
 {
+    QMainWindow::setCorner(Qt::TopLeftCorner, Qt::LeftDockWidgetArea);
+    pDWQueries->setAllowedAreas(Qt::LeftDockWidgetArea);
+    addDockWidget(Qt::LeftDockWidgetArea, pDWQueries);
 
+    QMainWindow::setCorner(Qt::BottomLeftCorner, Qt::BottomDockWidgetArea);
+    pDWResult->setAllowedAreas(Qt::BottomDockWidgetArea);
+    addDockWidget(Qt::BottomDockWidgetArea, pDWResult);
+
+
+    QMainWindow::setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
+    pDWSubtitles->setAllowedAreas(Qt::RightDockWidgetArea);
+    addDockWidget(Qt::RightDockWidgetArea, pDWSubtitles);
 }
 
 void MainWindow::clickedFind()

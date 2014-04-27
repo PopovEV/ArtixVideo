@@ -41,6 +41,7 @@ public:
     QAction *action_Connection;
     QAction *action_Exit;
     QAction *action_MovableDockWidgets;
+    QAction *action_defaultPosition;
     QWidget *centralWidget;
     QVBoxLayout *verticalLayout_5;
     DockWidget *DWVideo;
@@ -128,14 +129,18 @@ public:
         action_Exit->setObjectName(QString::fromUtf8("action_Exit"));
         action_MovableDockWidgets = new QAction(MainWindow);
         action_MovableDockWidgets->setObjectName(QString::fromUtf8("action_MovableDockWidgets"));
+        action_MovableDockWidgets->setCheckable(true);
+        action_defaultPosition = new QAction(MainWindow);
+        action_defaultPosition->setObjectName(QString::fromUtf8("action_defaultPosition"));
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
         centralWidget->setBaseSize(QSize(400, 300));
         verticalLayout_5 = new QVBoxLayout(centralWidget);
         verticalLayout_5->setSpacing(0);
-        verticalLayout_5->setContentsMargins(2, 2, 2, 2);
+        verticalLayout_5->setContentsMargins(11, 11, 11, 11);
         verticalLayout_5->setObjectName(QString::fromUtf8("verticalLayout_5"));
         verticalLayout_5->setSizeConstraint(QLayout::SetDefaultConstraint);
+        verticalLayout_5->setContentsMargins(2, 2, 2, 2);
         DWVideo = new DockWidget(centralWidget);
         DWVideo->setObjectName(QString::fromUtf8("DWVideo"));
         QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -150,8 +155,9 @@ public:
         dockWidgetContents->setObjectName(QString::fromUtf8("dockWidgetContents"));
         verticalLayout_2 = new QVBoxLayout(dockWidgetContents);
         verticalLayout_2->setSpacing(3);
-        verticalLayout_2->setContentsMargins(0, 0, 0, 0);
+        verticalLayout_2->setContentsMargins(11, 11, 11, 11);
         verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
+        verticalLayout_2->setContentsMargins(0, 0, 0, 0);
         verticalLayout = new QVBoxLayout();
         verticalLayout->setSpacing(0);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
@@ -268,8 +274,8 @@ public:
         volumeSlider = new Phonon::VolumeSlider(dockWidgetContents);
         volumeSlider->setObjectName(QString::fromUtf8("volumeSlider"));
         volumeSlider->setMaximumSize(QSize(150, 16777215));
-        volumeSlider->setTracking(true);
-        volumeSlider->setMuteVisible(true);
+        volumeSlider->setProperty("tracking", QVariant(true));
+        volumeSlider->setProperty("muteVisible", QVariant(true));
 
         horizontalLayout->addWidget(volumeSlider);
 
@@ -294,7 +300,7 @@ public:
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QString::fromUtf8("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 1110, 23));
+        menuBar->setGeometry(QRect(0, 0, 1110, 20));
         menu = new QMenu(menuBar);
         menu->setObjectName(QString::fromUtf8("menu"));
         menuSettings = new QMenu(menuBar);
@@ -313,9 +319,10 @@ public:
         dockWidgetContents_2->setObjectName(QString::fromUtf8("dockWidgetContents_2"));
         verticalLayout_3 = new QVBoxLayout(dockWidgetContents_2);
         verticalLayout_3->setSpacing(4);
-        verticalLayout_3->setContentsMargins(4, 4, 4, 4);
+        verticalLayout_3->setContentsMargins(11, 11, 11, 11);
         verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
         verticalLayout_3->setSizeConstraint(QLayout::SetMaximumSize);
+        verticalLayout_3->setContentsMargins(4, 4, 4, 4);
         tabWidget = new QTabWidget(dockWidgetContents_2);
         tabWidget->setObjectName(QString::fromUtf8("tabWidget"));
         tabWidget->setTabPosition(QTabWidget::West);
@@ -361,8 +368,9 @@ public:
         dockWidgetContents_3->setObjectName(QString::fromUtf8("dockWidgetContents_3"));
         verticalLayout_4 = new QVBoxLayout(dockWidgetContents_3);
         verticalLayout_4->setSpacing(6);
-        verticalLayout_4->setContentsMargins(4, 4, 4, 4);
+        verticalLayout_4->setContentsMargins(11, 11, 11, 11);
         verticalLayout_4->setObjectName(QString::fromUtf8("verticalLayout_4"));
+        verticalLayout_4->setContentsMargins(4, 4, 4, 4);
         tableView = new QTableView(dockWidgetContents_3);
         tableView->setObjectName(QString::fromUtf8("tableView"));
         tableView->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -384,9 +392,10 @@ public:
         dockWidgetContents_5->setObjectName(QString::fromUtf8("dockWidgetContents_5"));
         verticalLayout_6 = new QVBoxLayout(dockWidgetContents_5);
         verticalLayout_6->setSpacing(4);
-        verticalLayout_6->setContentsMargins(4, 4, 4, 4);
+        verticalLayout_6->setContentsMargins(11, 11, 11, 11);
         verticalLayout_6->setObjectName(QString::fromUtf8("verticalLayout_6"));
         verticalLayout_6->setSizeConstraint(QLayout::SetMaximumSize);
+        verticalLayout_6->setContentsMargins(4, 4, 4, 4);
         listView_Subtitles = new ListView(dockWidgetContents_5);
         listView_Subtitles->setObjectName(QString::fromUtf8("listView_Subtitles"));
         listView_Subtitles->setStyleSheet(QString::fromUtf8("QListView  {\n"
@@ -443,6 +452,7 @@ public:
         menu->addAction(action_Exit);
         menuSettings->addAction(action_Settings);
         menu_2->addAction(action_MovableDockWidgets);
+        menu_2->addAction(action_defaultPosition);
 
         retranslateUi(MainWindow);
 
@@ -459,6 +469,7 @@ public:
         action_Connection->setText(QApplication::translate("MainWindow", "\320\237\320\276\320\264\320\272\320\273\321\216\321\207\320\265\320\275\320\270\321\217", 0, QApplication::UnicodeUTF8));
         action_Exit->setText(QApplication::translate("MainWindow", "\320\222\321\213\321\205\320\276\320\264", 0, QApplication::UnicodeUTF8));
         action_MovableDockWidgets->setText(QApplication::translate("MainWindow", "\320\237\320\265\321\200\320\265\320\274\320\265\321\211\320\265\320\275\320\270\320\265 \320\276\320\272\320\276\320\275", 0, QApplication::UnicodeUTF8));
+        action_defaultPosition->setText(QApplication::translate("MainWindow", "\320\240\320\260\321\201\320\277\320\276\320\273\320\276\320\266\320\270\321\202\321\214 \320\277\320\276 \321\203\320\274\320\276\320\273\321\207\320\260\320\275\320\270\321\216", 0, QApplication::UnicodeUTF8));
         pushButton_Play->setText(QString());
         pushButton_Pause->setText(QString());
         label_currentTime->setText(QApplication::translate("MainWindow", "00:00:00", 0, QApplication::UnicodeUTF8));

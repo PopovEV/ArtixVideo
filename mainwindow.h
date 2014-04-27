@@ -76,7 +76,7 @@ public slots:
     void tabChanged(int tabIndex);
     void connectionCliched();
     void settingsClicked();
-    void movableDockWidgetClicked();
+    void movableDockWidgetClicked(bool cheched);
     void setDefaultDockWidgetPosition();
 
 protected:
