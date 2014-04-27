@@ -33,6 +33,7 @@ private:
     VideoPlayer *videoPlayer;
     MediaObject *mediaObject;
     SeekSlider *seekSlider;
+    VideoWidget *videoWidget;
     VolumeSlider *volumeSlider;
     QLabel *currentTimeLabel;
     QLabel *maxTimeLabel;
@@ -60,7 +61,9 @@ public slots:
     void setCurrentTime();
     void playNextVideo();
     void playPreviousVideo();
-    
+
+protected:
+    bool eventFilter(QObject *obj, QEvent *event);
 };
 
 #endif // MEDIAPLAYER_H

@@ -3,6 +3,8 @@
 #include "subtitlesmanager.h"
 #include "config.h"
 
+#include <QMouseEvent>
+
 MediaPlayer::MediaPlayer(VideoPlayer *videoPlayer, SeekSlider *seekSlider, VolumeSlider *volumeSlider,
                          QObject *parent) : QObject(parent)
 {
@@ -10,6 +12,8 @@ MediaPlayer::MediaPlayer(VideoPlayer *videoPlayer, SeekSlider *seekSlider, Volum
     mediaObject = this->videoPlayer->mediaObject();
     this->seekSlider = seekSlider;
     this->volumeSlider = volumeSlider;
+    videoWidget = videoPlayer->videoWidget();
+    videoWidget->installEventFilter(this);
 
     seekSlider->setMediaObject(mediaObject);
     volumeSlider->setAudioOutput(videoPlayer->audioOutput());
@@ -140,3 +144,40 @@ void MediaPlayer::setMaxTimeLabel(QLabel *value)
     maxTimeLabel = value;
 }
 
+bool MediaPlayer::eventFilter(QObject *obj, QEvent *event)
+{
+
+    QMouseEvent *mouse = static_cast<QMouseEvent *>(event);
+    QKeyEvent *key = static_cast<QKeyEvent *>(event);
+
+    bool enterFullScreen = false;
+    if (obj == videoWidget) {
+        switch (event->type()) {
+        case QEvent::MouseButtonDblClick:
+            if(mouse->button() == Qt::LeftButton) {
+                enterFullScreen = true;
+            }
+            break;
+        case QEvent::KeyPress:
+            if(key->key() == Qt::Key_Escape) {
+                enterFullScreen = true;
+            }
+            break;
+        default:
+            return false;
+        }
+
+        if(enterFullScreen) {
+            if(!videoWidget->isFullScreen()){
+                videoWidget->enterFullScreen();
+            }
+            else{
+                videoWidget->exitFullScreen();
+            }
+
+            return true;
+        }
+    }
+
+    return videoWidget->eventFilter(obj, event);
+}
